@@ -22,7 +22,10 @@ under way) and a marker legend in the header.
 **Map screen (baseline screen).** Rig markers and port markers on OSM tiles.
 In-transit shipments render as vessel markers positioned along the origin→destination
 line, with a faint route line. Clicking a rig marker opens the rig panel in
-detail view; clicking the map or pressing Esc closes it. On selection the map
+detail view; clicking a vessel marker opens the rig panel on that shipment's
+rig — the destination, or the origin for outbound rig→port runs — with the
+Shipments tab active and that shipment selected. Clicking the map or pressing
+Esc closes the panel. On selection the map
 pans the rig into the area left of the drawer, and the route lines of shipments
 touching it are highlighted.
 
@@ -41,7 +44,9 @@ touching it are highlighted.
     shipments** — never stored separately, so they can't drift.
   - **Shipments** — all shipments touching this rig: direction, contents, vessel,
     ETA, status, and a step timeline (requested → loading → in transit → delivered).
-    Selecting an in-transit shipment highlights its vessel on the map.
+    Selecting an in-transit shipment highlights its vessel on the map; the link
+    is two-way — clicking a vessel on the map lands here with that shipment
+    selected.
 
 **Order flow (the real write).** "Order goods" button in the rig panel → small
 form: pick item from catalog, quantity. Submit → `POST /api/shipments` creates a
@@ -141,7 +146,9 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
 3. In the browser: map shows North Sea with rig, port, and vessel markers →
    click a rig marker (or "All rigs" → a row) → drawer shows inventory with
    realistic items, Inbound/Outbound lists, Shipments tab with statuses and
-   timelines; the back arrow returns to the All rigs list.
+   timelines; the back arrow returns to the All rigs list; clicking a vessel
+   marker opens the drawer on that shipment's rig with the Shipments tab
+   active and the shipment highlighted.
 4. Order flow: order an item → new shipment appears as `requested` in Shipments
    and Inbound → `GET /api/shipments?rigId=…` returns it → stop and restart the
    server → it is still there (fixture file was rewritten).
