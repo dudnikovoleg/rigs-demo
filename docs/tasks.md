@@ -151,6 +151,35 @@ through.
   (restart-persistence is verified locally in slice 6 — Render's disk is
   ephemeral, per spec §6).
 
+## Slice 8 — Vessel click opens the shipment in the rig drawer
+
+**Delivers:** clicking a vessel marker opens the rig panel in detail view on
+that shipment's rig — the destination for port→rig shipments, the origin for
+rig→port — with the Shipments tab active and the clicked shipment selected
+(spec §2). This completes the two-way tab ↔ map link started in slice 4.
+Concretely: `MapView` vessel markers gain a click handler that resolves the
+target rig from the shipment's `origin`/`destination` and reports
+`(rigId, shipmentId)` up to App; `App.tsx` gets a combined open action
+(`changeDrawer` currently clears `selectedShipmentId` on every drawer change,
+so vessel click must set drawer detail **and** the selected shipment
+together); `RigPanel`'s local tab state (defaults to Warehouse, reset per rig
+via `key={rig.id}`) gets an initial-tab mechanism so a vessel click lands on
+Shipments while a plain rig click still defaults to Warehouse. `ShipmentsTab`
+highlighting already keys off `selectedShipmentId` — reused as-is.
+
+**Files:** `client/src/App.tsx`,
+`client/src/components/{MapView,RigPanel}.tsx`.
+
+**Verify:**
+- Click a vessel → drawer opens on the correct rig (destination for inbound;
+  pick an outbound rig→port fixture shipment and confirm the **origin** rig
+  opens), Shipments tab active, that shipment highlighted in the list and its
+  vessel/route highlighted on the map.
+- Regression: rig-marker click still opens the Warehouse tab; selecting a
+  shipment in the tab still highlights its vessel; Esc / map click still
+  closes and clears selection.
+- `npm run typecheck` passes.
+
 ## Ordering risks (reviewed; baked into the ordering above)
 
 1. **Fixture schema churn** — `GET /api/rigs` counts read inventory *and*
