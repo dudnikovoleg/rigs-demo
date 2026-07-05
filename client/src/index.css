@@ -54,3 +54,39 @@
     0 0 0 2px rgba(255, 255, 255, 0.9),
     0 0 0 7px rgba(255, 107, 44, 0.35);
 }
+
+/* Shore supply bases: upright steel-blue square, distinct from the rotated rig pin */
+.port-pin {
+  width: 12px;
+  height: 12px;
+  background: #16293a;
+  border: 2px solid #0b141c;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
+}
+
+/* In-transit supply vessels, lerped along their route line */
+.vessel-pin {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #38bdf8;
+  border: 2px solid #0b141c;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
+}
+/* Applied when the shipment is selected in the Shipments tab (slice 4). */
+.vessel-pin--selected {
+  animation: vessel-ping 1.6s ease-out infinite;
+}
+@keyframes vessel-ping {
+  0% {
+    box-shadow:
+      0 0 0 2px rgba(255, 255, 255, 0.9),
+      0 0 0 4px rgba(56, 189, 248, 0.55);
+  }
+  70%,
+  100% {
+    box-shadow:
+      0 0 0 2px rgba(255, 255, 255, 0.9),
+      0 0 0 13px rgba(56, 189, 248, 0);
+  }
+}

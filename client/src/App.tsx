@@ -15,6 +15,15 @@ type DrawerState =
 export default function App() {
   const [drawer, setDrawer] = useState<DrawerState>({ view: "closed" });
 
+  // Selected in-transit shipment (Shipments tab ↔ vessel marker), same
+  // App-owned pattern as the selected rig. Scoped to one rig's tab, so any
+  // drawer change drops it.
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
+  const changeDrawer = (next: DrawerState) => {
+    setSelectedShipmentId(null);
+    setDrawer(next);
+  };
+
   // Keep the last selected rig so the drawer stays populated during the
   // slide-out transition.
   const [shownRigId, setShownRigId] = useState<string | null>(null);
@@ -24,7 +33,10 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDrawer({ view: "closed" });
+      if (e.key === "Escape") {
+        setSelectedShipmentId(null);
+        setDrawer({ view: "closed" });
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -47,14 +59,17 @@ export default function App() {
         <main className="relative flex-1">
           <MapView
             selectedRigId={selectedRigId}
+            selectedShipmentId={selectedShipmentId}
             onSelectRig={(id) =>
-              setDrawer(id ? { view: "detail", rigId: id } : { view: "closed" })
+              changeDrawer(id ? { view: "detail", rigId: id } : { view: "closed" })
             }
           />
           <RigPanel
             open={drawer.view !== "closed"}
             rigId={shownRigId}
-            onClose={() => setDrawer({ view: "closed" })}
+            selectedShipmentId={selectedShipmentId}
+            onSelectShipment={setSelectedShipmentId}
+            onClose={() => changeDrawer({ view: "closed" })}
           />
         </main>
       </div>

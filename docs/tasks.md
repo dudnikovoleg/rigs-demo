@@ -93,7 +93,9 @@ shipment in the Shipments tab highlights its vessel (selected-shipment
 state in `App.tsx`, extending the slice-2 pattern).
 
 **Files:** `server/src/routes.ts`, `client/src/{api,types}.ts`,
-`client/src/App.tsx`, `client/src/components/{MapView,ShipmentsTab}.tsx`,
+`client/src/App.tsx`,
+`client/src/components/{MapView,ShipmentsTab,RigPanel}.tsx`
+(RigPanel passes the selected-shipment props through to ShipmentsTab),
 `client/src/index.css`.
 
 **Verify:**

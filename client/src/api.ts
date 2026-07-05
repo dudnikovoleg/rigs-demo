@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Item, RigDetail, RigSummary, Shipment } from "./types";
+import type { Item, Port, RigDetail, RigSummary, Shipment } from "./types";
 
 // Query keys, one entry per API resource. Mutations invalidate by these keys
 // (the order mutation in slice 6 must invalidate both shipments and rigs).
@@ -38,6 +38,21 @@ export function useItems() {
   return useQuery({
     queryKey: queryKeys.items,
     queryFn: () => fetchJson<Item[]>("/api/items"),
+  });
+}
+
+export function usePorts() {
+  return useQuery({
+    queryKey: queryKeys.ports,
+    queryFn: () => fetchJson<Port[]>("/api/ports"),
+  });
+}
+
+/** All shipments — feeds vessel markers and route lines on the map. */
+export function useAllShipments() {
+  return useQuery({
+    queryKey: queryKeys.shipments(),
+    queryFn: () => fetchJson<Shipment[]>("/api/shipments"),
   });
 }
 

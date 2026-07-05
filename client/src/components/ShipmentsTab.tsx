@@ -4,6 +4,9 @@ import ShipmentTimeline from "./ShipmentTimeline";
 
 interface Props {
   rigId: string;
+  /** Selected in-transit shipment — its vessel is highlighted on the map. */
+  selectedShipmentId: string | null;
+  onSelectShipment: (id: string | null) => void;
 }
 
 export function formatEta(iso: string): string {
@@ -19,15 +22,25 @@ function ShipmentCard({
   shipment,
   rigId,
   catalog,
+  selected,
+  onToggleSelect,
 }: {
   shipment: Shipment;
   rigId: string;
   catalog: Map<string, Item>;
+  selected: boolean;
+  /** Set for in-transit shipments only — they have a vessel on the map. */
+  onToggleSelect?: () => void;
 }) {
   const inbound = shipment.destination.type === "rig" && shipment.destination.id === rigId;
 
   return (
-    <article className="rounded border border-seam bg-deck/40 p-3">
+    <article
+      onClick={onToggleSelect}
+      className={`rounded border p-3 transition-colors ${
+        selected ? "border-sky-400/70 bg-deck/70" : "border-seam bg-deck/40"
+      } ${onToggleSelect ? "cursor-pointer hover:border-sky-400/40" : ""}`}
+    >
       <div className="flex items-center justify-between">
         <span
           className={`text-[10px] font-semibold uppercase tracking-widest ${
@@ -41,7 +54,14 @@ function ShipmentCard({
         </span>
       </div>
 
-      <div className="mt-1 text-sm text-paper">{shipment.vessel}</div>
+      <div className="mt-1 flex items-baseline justify-between text-sm text-paper">
+        {shipment.vessel}
+        {onToggleSelect && (
+          <span className="text-[10px] uppercase tracking-wider text-fog">
+            {selected ? "◉ on map" : "○ show on map"}
+          </span>
+        )}
+      </div>
 
       <ul className="mt-1.5 space-y-0.5">
         {shipment.items.map((line) => {
@@ -64,7 +84,7 @@ function ShipmentCard({
   );
 }
 
-export default function ShipmentsTab({ rigId }: Props) {
+export default function ShipmentsTab({ rigId, selectedShipmentId, onSelectShipment }: Props) {
   const { data: shipments, isLoading } = useShipments(rigId);
   const { data: items } = useItems();
   const catalog = new Map((items ?? []).map((item) => [item.id, item]));
@@ -86,7 +106,19 @@ export default function ShipmentsTab({ rigId }: Props) {
       </h3>
       <div className="mt-2 space-y-3">
         {sorted.map((shipment) => (
-          <ShipmentCard key={shipment.id} shipment={shipment} rigId={rigId} catalog={catalog} />
+          <ShipmentCard
+            key={shipment.id}
+            shipment={shipment}
+            rigId={rigId}
+            catalog={catalog}
+            selected={shipment.id === selectedShipmentId}
+            onToggleSelect={
+              shipment.status === "in_transit"
+                ? () =>
+                    onSelectShipment(shipment.id === selectedShipmentId ? null : shipment.id)
+                : undefined
+            }
+          />
         ))}
         {sorted.length === 0 && (
           <p className="py-2 text-xs text-fog">No shipments touching this installation.</p>

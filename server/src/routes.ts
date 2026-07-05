@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   getItems,
+  getPorts,
   getRigDetail,
   getRigSummaries,
   getShipments,
@@ -20,6 +21,10 @@ routes.get("/api/rigs/:id", (req, res) => {
     return;
   }
   res.json(rig);
+});
+
+routes.get("/api/ports", (_req, res) => {
+  res.json(getPorts());
 });
 
 routes.get("/api/items", (_req, res) => {

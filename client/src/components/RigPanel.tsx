@@ -7,7 +7,15 @@ import WarehouseTab from "./WarehouseTab";
 type Tab = "warehouse" | "shipments";
 
 /** Rendered with `key={rig.id}` so the active tab resets to Warehouse per rig. */
-function PanelBody({ rig }: { rig: RigDetail }) {
+function PanelBody({
+  rig,
+  selectedShipmentId,
+  onSelectShipment,
+}: {
+  rig: RigDetail;
+  selectedShipmentId: string | null;
+  onSelectShipment: (id: string | null) => void;
+}) {
   const [tab, setTab] = useState<Tab>("warehouse");
 
   return (
@@ -34,7 +42,11 @@ function PanelBody({ rig }: { rig: RigDetail }) {
         {tab === "warehouse" ? (
           <WarehouseTab rigId={rig.id} inventory={rig.inventory} />
         ) : (
-          <ShipmentsTab rigId={rig.id} />
+          <ShipmentsTab
+            rigId={rig.id}
+            selectedShipmentId={selectedShipmentId}
+            onSelectShipment={onSelectShipment}
+          />
         )}
       </div>
     </>
@@ -45,6 +57,9 @@ interface Props {
   open: boolean;
   /** Last selected rig; kept during the slide-out transition. */
   rigId: string | null;
+  /** Selected in-transit shipment; passed through to the Shipments tab. */
+  selectedShipmentId: string | null;
+  onSelectShipment: (id: string | null) => void;
   onClose: () => void;
 }
 
@@ -66,7 +81,13 @@ function formatCoords(lat: number, lon: number): string {
   return `${lat.toFixed(2)}°N ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
 }
 
-export default function RigPanel({ open, rigId, onClose }: Props) {
+export default function RigPanel({
+  open,
+  rigId,
+  selectedShipmentId,
+  onSelectShipment,
+  onClose,
+}: Props) {
   const { data: rig } = useRig(rigId);
 
   return (
@@ -102,7 +123,12 @@ export default function RigPanel({ open, rigId, onClose }: Props) {
       </div>
 
       {rig ? (
-        <PanelBody key={rig.id} rig={rig} />
+        <PanelBody
+          key={rig.id}
+          rig={rig}
+          selectedShipmentId={selectedShipmentId}
+          onSelectShipment={onSelectShipment}
+        />
       ) : (
         <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>
       )}
