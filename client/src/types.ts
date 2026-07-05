@@ -58,3 +58,8 @@ export interface RigSummary extends Rig {
   inboundCount: number;
   outboundCount: number;
 }
+
+/** `GET /api/rigs/:id` — rig plus its inventory lines. */
+export interface RigDetail extends Rig {
+  inventory: ItemQuantity[];
+}

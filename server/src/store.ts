@@ -61,6 +61,11 @@ export interface RigSummary extends Rig {
   outboundCount: number;
 }
 
+/** `GET /api/rigs/:id` — rig plus its inventory lines. */
+export interface RigDetail extends Rig {
+  inventory: ItemQuantity[];
+}
+
 // Resolves to server/fixtures from both src/ (dev) and dist/ (build).
 const fixturesDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -91,6 +96,12 @@ export function getInventory(): Inventory {
 
 export function getShipments(): Shipment[] {
   return readFixture<Shipment[]>("shipments");
+}
+
+export function getRigDetail(id: string): RigDetail | undefined {
+  const rig = getRigs().find((r) => r.id === id);
+  if (!rig) return undefined;
+  return { ...rig, inventory: getInventory()[id] ?? [] };
 }
 
 export function getRigSummaries(): RigSummary[] {
