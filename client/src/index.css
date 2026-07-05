@@ -48,22 +48,9 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
   transition: box-shadow 150ms ease;
 }
+/* Applied when marker selection arrives with the detail drawer (slice 2). */
 .rig-pin--selected {
   box-shadow:
     0 0 0 2px rgba(255, 255, 255, 0.9),
     0 0 0 7px rgba(255, 107, 44, 0.35);
-}
-
-.port-pin {
-  width: 13px;
-  height: 13px;
-  border-radius: 9999px;
-  background: #16293a;
-  border: 2px solid #e9f0f4;
-  box-shadow: 0 0 0 2px rgba(22, 41, 58, 0.3);
-}
-
-.vessel-pin {
-  width: 18px;
-  height: 18px;
 }
