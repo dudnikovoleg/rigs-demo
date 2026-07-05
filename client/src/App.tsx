@@ -5,12 +5,13 @@ import RigPanel from "./components/RigPanel";
 
 const queryClient = new QueryClient();
 
-// Drawer UI state (spec §5) — "list" becomes reachable with the
-// "All rigs" button in slice 5.
+// Drawer UI state (spec §5).
 type DrawerState =
   | { view: "closed" }
   | { view: "list" }
   | { view: "detail"; rigId: string };
+
+type OpenDrawerState = Exclude<DrawerState, { view: "closed" }>;
 
 export default function App() {
   const [drawer, setDrawer] = useState<DrawerState>({ view: "closed" });
@@ -24,11 +25,11 @@ export default function App() {
     setDrawer(next);
   };
 
-  // Keep the last selected rig so the drawer stays populated during the
-  // slide-out transition.
-  const [shownRigId, setShownRigId] = useState<string | null>(null);
+  // Keep the last open drawer content so the panel stays populated during
+  // the slide-out transition.
+  const [shown, setShown] = useState<OpenDrawerState>({ view: "list" });
   useEffect(() => {
-    if (drawer.view === "detail") setShownRigId(drawer.rigId);
+    if (drawer.view !== "closed") setShown(drawer);
   }, [drawer]);
 
   useEffect(() => {
@@ -51,9 +52,17 @@ export default function App() {
           <h1 className="font-display text-[16px] uppercase tracking-[0.3em]">
             Rigs <span className="text-flare">·</span> Offshore Logistics
           </h1>
-          <span className="font-display text-[11px] uppercase tracking-widest text-fog">
-            North Sea
-          </span>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => changeDrawer({ view: "list" })}
+              className="rounded border border-seam px-3 py-1 font-display text-[11px] uppercase tracking-widest text-fog transition-colors hover:border-flare hover:text-paper focus-visible:outline focus-visible:outline-flare"
+            >
+              All rigs
+            </button>
+            <span className="font-display text-[11px] uppercase tracking-widest text-fog">
+              North Sea
+            </span>
+          </div>
         </header>
 
         <main className="relative flex-1">
@@ -66,9 +75,11 @@ export default function App() {
           />
           <RigPanel
             open={drawer.view !== "closed"}
-            rigId={shownRigId}
+            shown={shown}
             selectedShipmentId={selectedShipmentId}
             onSelectShipment={setSelectedShipmentId}
+            onSelectRig={(id) => changeDrawer({ view: "detail", rigId: id })}
+            onShowList={() => changeDrawer({ view: "list" })}
             onClose={() => changeDrawer({ view: "closed" })}
           />
         </main>

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useRig } from "../api";
-import type { Rig, RigDetail } from "../types";
+import { useRig, useRigs } from "../api";
+import type { Rig, RigDetail, RigSummary } from "../types";
 import ShipmentsTab from "./ShipmentsTab";
 import WarehouseTab from "./WarehouseTab";
 
@@ -55,11 +55,13 @@ function PanelBody({
 
 interface Props {
   open: boolean;
-  /** Last selected rig; kept during the slide-out transition. */
-  rigId: string | null;
+  /** Last open drawer content; kept during the slide-out transition. */
+  shown: { view: "list" } | { view: "detail"; rigId: string };
   /** Selected in-transit shipment; passed through to the Shipments tab. */
   selectedShipmentId: string | null;
   onSelectShipment: (id: string | null) => void;
+  onSelectRig: (id: string) => void;
+  onShowList: () => void;
   onClose: () => void;
 }
 
@@ -81,14 +83,69 @@ function formatCoords(lat: number, lon: number): string {
   return `${lat.toFixed(2)}°N ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? "E" : "W"}`;
 }
 
+function RigRow({ rig, onSelect }: { rig: RigSummary; onSelect: () => void }) {
+  return (
+    <button
+      onClick={onSelect}
+      className="w-full border-b border-seam px-5 py-3 text-left transition-colors hover:bg-seam/40 focus-visible:outline focus-visible:-outline-offset-2 focus-visible:outline-flare"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-display text-[14px] uppercase tracking-[0.08em]">
+          {rig.name}
+        </span>
+        <RigStatusDot status={rig.status} />
+      </div>
+      <p className="mt-0.5 text-[11px] text-fog">{rig.operator}</p>
+      <div className="mt-1.5 flex gap-4 font-mono text-[11px] text-fog">
+        <span>
+          <span className="text-paper">{rig.inventorySkuCount}</span> SKUs
+        </span>
+        <span>
+          <span className="text-paper">{rig.inboundCount}</span> inbound
+        </span>
+        <span>
+          <span className="text-paper">{rig.outboundCount}</span> outbound
+        </span>
+      </div>
+    </button>
+  );
+}
+
+function RigList({ onSelectRig }: { onSelectRig: (id: string) => void }) {
+  const { data: rigs } = useRigs();
+
+  if (!rigs) return <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>;
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      {rigs.map((rig) => (
+        <RigRow key={rig.id} rig={rig} onSelect={() => onSelectRig(rig.id)} />
+      ))}
+    </div>
+  );
+}
+
 export default function RigPanel({
   open,
-  rigId,
+  shown,
   selectedShipmentId,
   onSelectShipment,
+  onSelectRig,
+  onShowList,
   onClose,
 }: Props) {
+  const rigId = shown.view === "detail" ? shown.rigId : null;
   const { data: rig } = useRig(rigId);
+
+  const closeButton = (
+    <button
+      onClick={onClose}
+      aria-label="Close panel"
+      className="-mr-1 -mt-1 rounded px-2 py-0.5 text-fog transition-colors hover:text-paper focus-visible:outline focus-visible:outline-flare"
+    >
+      ✕
+    </button>
+  );
 
   return (
     <aside
@@ -97,40 +154,63 @@ export default function RigPanel({
         open ? "translate-x-0" : "translate-x-full"
       }`}
     >
-      {/* Header — installation data plate */}
-      <div className="border-b border-seam px-5 pb-4 pt-5">
-        <div className="flex items-start justify-between">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-fog">
-            Offshore installation{rig ? ` · ${rig.operator}` : ""}
-          </p>
-          <button
-            onClick={onClose}
-            aria-label="Close panel"
-            className="-mr-1 -mt-1 rounded px-2 py-0.5 text-fog transition-colors hover:text-paper focus-visible:outline focus-visible:outline-flare"
-          >
-            ✕
-          </button>
-        </div>
-        <h2 className="mt-1 font-display text-2xl uppercase tracking-[0.08em]">
-          {rig?.name ?? "…"}
-        </h2>
-        {rig && (
-          <div className="mt-1.5 flex items-center gap-3 text-[11px]">
-            <RigStatusDot status={rig.status} />
-            <span className="font-mono text-fog">{formatCoords(rig.lat, rig.lon)}</span>
+      {shown.view === "list" ? (
+        <>
+          {/* Header — fleet roster */}
+          <div className="border-b border-seam px-5 pb-4 pt-5">
+            <div className="flex items-start justify-between">
+              <p className="text-[10px] uppercase tracking-[0.3em] text-fog">
+                Fleet overview · North Sea
+              </p>
+              {closeButton}
+            </div>
+            <h2 className="mt-1 font-display text-2xl uppercase tracking-[0.08em]">
+              All rigs
+            </h2>
           </div>
-        )}
-      </div>
-
-      {rig ? (
-        <PanelBody
-          key={rig.id}
-          rig={rig}
-          selectedShipmentId={selectedShipmentId}
-          onSelectShipment={onSelectShipment}
-        />
+          <RigList onSelectRig={onSelectRig} />
+        </>
       ) : (
-        <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>
+        <>
+          {/* Header — installation data plate */}
+          <div className="border-b border-seam px-5 pb-4 pt-5">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onShowList}
+                  aria-label="Back to all rigs"
+                  className="-ml-1 -mt-1 rounded px-1.5 py-0.5 text-fog transition-colors hover:text-paper focus-visible:outline focus-visible:outline-flare"
+                >
+                  ←
+                </button>
+                <p className="text-[10px] uppercase tracking-[0.3em] text-fog">
+                  Offshore installation{rig ? ` · ${rig.operator}` : ""}
+                </p>
+              </div>
+              {closeButton}
+            </div>
+            <h2 className="mt-1 font-display text-2xl uppercase tracking-[0.08em]">
+              {rig?.name ?? "…"}
+            </h2>
+            {rig && (
+              <div className="mt-1.5 flex items-center gap-3 text-[11px]">
+                <RigStatusDot status={rig.status} />
+                <span className="font-mono text-fog">{formatCoords(rig.lat, rig.lon)}</span>
+              </div>
+            )}
+          </div>
+
+          {rig ? (
+            <PanelBody
+              key={rig.id}
+              rig={rig}
+              selectedShipmentId={selectedShipmentId}
+              onSelectShipment={onSelectShipment}
+            />
+          ) : (
+            <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>
+          )}
+        </>
       )}
     </aside>
   );
