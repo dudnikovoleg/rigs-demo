@@ -1,14 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import type { Item, Port, RigDetail, RigSummary, Shipment } from "./types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { Item, NewShipmentInput, Port, RigDetail, RigSummary, Shipment } from "./types";
 
 // Query keys, one entry per API resource. Mutations invalidate by these keys
-// (the order mutation in slice 6 must invalidate both shipments and rigs).
+// (the order mutation invalidates both shipments and rigs).
 export const queryKeys = {
   rigs: ["rigs"] as const,
   rig: (id: string) => ["rigs", id] as const,
   items: ["items"] as const,
   ports: ["ports"] as const,
   shipments: (rigId?: string) => ["shipments", rigId ?? "all"] as const,
+  /** Prefix matching every shipments query — what mutations invalidate. */
+  shipmentsRoot: ["shipments"] as const,
 };
 
 // Relative paths only — the Vite dev proxy forwards /api to the server, and
@@ -62,5 +64,28 @@ export function useShipments(rigId: string | null) {
     queryKey: queryKeys.shipments(rigId ?? undefined),
     queryFn: () => fetchJson<Shipment[]>(`/api/shipments?rigId=${rigId}`),
     enabled: rigId !== null,
+  });
+}
+
+/**
+ * Order goods for a rig — the one real write. Invalidates shipments and
+ * rigs (list-view counts change) so the new shipment shows up everywhere.
+ */
+export function useCreateShipment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: NewShipmentInput) => {
+      const res = await fetch("/api/shipments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) throw new Error(`POST /api/shipments failed: ${res.status} ${res.statusText}`);
+      return res.json() as Promise<Shipment>;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: queryKeys.shipmentsRoot });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.rigs });
+    },
   });
 }

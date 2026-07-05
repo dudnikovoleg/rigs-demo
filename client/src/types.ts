@@ -52,6 +52,13 @@ export interface Shipment {
   items: ItemQuantity[];
 }
 
+/** `POST /api/shipments` request body. */
+export interface NewShipmentInput {
+  rigId: string;
+  itemId: string;
+  quantity: number;
+}
+
 /** `GET /api/rigs` — rig plus counts computed server-side. */
 export interface RigSummary extends Rig {
   inventorySkuCount: number;

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  createShipment,
   getItems,
   getPorts,
   getRigDetail,
@@ -34,4 +35,17 @@ routes.get("/api/items", (_req, res) => {
 routes.get("/api/shipments", (req, res) => {
   const { rigId } = req.query;
   res.json(typeof rigId === "string" ? getShipmentsForRig(rigId) : getShipments());
+});
+
+routes.post("/api/shipments", (req, res) => {
+  const { rigId, itemId, quantity } = req.body ?? {};
+  if (typeof rigId !== "string" || typeof itemId !== "string" || typeof quantity !== "number") {
+    res.status(400).json({ error: "body must be { rigId, itemId, quantity }" });
+    return;
+  }
+  try {
+    res.status(201).json(createShipment({ rigId, itemId, quantity }));
+  } catch (err) {
+    res.status(400).json({ error: (err as Error).message });
+  }
 });

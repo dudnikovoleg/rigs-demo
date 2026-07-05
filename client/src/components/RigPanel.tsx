@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRig, useRigs } from "../api";
 import type { Rig, RigDetail, RigSummary } from "../types";
+import OrderForm from "./OrderForm";
 import ShipmentsTab from "./ShipmentsTab";
 import WarehouseTab from "./WarehouseTab";
 
@@ -17,6 +18,7 @@ function PanelBody({
   onSelectShipment: (id: string | null) => void;
 }) {
   const [tab, setTab] = useState<Tab>("warehouse");
+  const [ordering, setOrdering] = useState(false);
 
   return (
     <>
@@ -47,6 +49,20 @@ function PanelBody({
             selectedShipmentId={selectedShipmentId}
             onSelectShipment={onSelectShipment}
           />
+        )}
+      </div>
+
+      {/* Order flow — the one real write (spec §2). */}
+      <div className="border-t border-seam bg-deck/30 px-5 py-4">
+        {ordering ? (
+          <OrderForm rigId={rig.id} onClose={() => setOrdering(false)} />
+        ) : (
+          <button
+            onClick={() => setOrdering(true)}
+            className="w-full rounded border border-flare/70 py-2 font-display text-[12px] uppercase tracking-[0.2em] text-flare transition-colors hover:bg-flare/10 focus-visible:outline focus-visible:outline-flare"
+          >
+            Order goods
+          </button>
         )}
       </div>
     </>
