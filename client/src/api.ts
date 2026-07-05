@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Item, RigDetail, RigSummary } from "./types";
+import type { Item, RigDetail, RigSummary, Shipment } from "./types";
 
 // Query keys, one entry per API resource. Mutations invalidate by these keys
 // (the order mutation in slice 6 must invalidate both shipments and rigs).
@@ -38,5 +38,14 @@ export function useItems() {
   return useQuery({
     queryKey: queryKeys.items,
     queryFn: () => fetchJson<Item[]>("/api/items"),
+  });
+}
+
+/** Shipments touching one rig (origin or destination). */
+export function useShipments(rigId: string | null) {
+  return useQuery({
+    queryKey: queryKeys.shipments(rigId ?? undefined),
+    queryFn: () => fetchJson<Shipment[]>(`/api/shipments?rigId=${rigId}`),
+    enabled: rigId !== null,
   });
 }

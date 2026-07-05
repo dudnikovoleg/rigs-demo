@@ -98,6 +98,15 @@ export function getShipments(): Shipment[] {
   return readFixture<Shipment[]>("shipments");
 }
 
+/** Shipments whose origin or destination is the given rig. */
+export function getShipmentsForRig(rigId: string): Shipment[] {
+  return getShipments().filter(
+    (s) =>
+      (s.origin.type === "rig" && s.origin.id === rigId) ||
+      (s.destination.type === "rig" && s.destination.id === rigId),
+  );
+}
+
 export function getRigDetail(id: string): RigDetail | undefined {
   const rig = getRigs().find((r) => r.id === id);
   if (!rig) return undefined;

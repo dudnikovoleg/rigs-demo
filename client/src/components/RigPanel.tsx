@@ -1,6 +1,45 @@
+import { useState } from "react";
 import { useRig } from "../api";
-import type { Rig } from "../types";
+import type { Rig, RigDetail } from "../types";
+import ShipmentsTab from "./ShipmentsTab";
 import WarehouseTab from "./WarehouseTab";
+
+type Tab = "warehouse" | "shipments";
+
+/** Rendered with `key={rig.id}` so the active tab resets to Warehouse per rig. */
+function PanelBody({ rig }: { rig: RigDetail }) {
+  const [tab, setTab] = useState<Tab>("warehouse");
+
+  return (
+    <>
+      <div role="tablist" className="flex border-b border-seam px-5">
+        {(["warehouse", "shipments"] as const).map((t) => (
+          <button
+            key={t}
+            role="tab"
+            aria-selected={tab === t}
+            onClick={() => setTab(t)}
+            className={`-mb-px border-b-2 px-3 py-2.5 font-display text-[12px] uppercase tracking-[0.2em] transition-colors focus-visible:outline focus-visible:outline-flare ${
+              tab === t
+                ? "border-flare text-paper"
+                : "border-transparent text-fog hover:text-paper"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        {tab === "warehouse" ? (
+          <WarehouseTab rigId={rig.id} inventory={rig.inventory} />
+        ) : (
+          <ShipmentsTab rigId={rig.id} />
+        )}
+      </div>
+    </>
+  );
+}
 
 interface Props {
   open: boolean;
@@ -62,20 +101,11 @@ export default function RigPanel({ open, rigId, onClose }: Props) {
         )}
       </div>
 
-      {/* Tabs — Shipments joins in slice 3 */}
-      <div className="flex border-b border-seam px-5">
-        <span className="-mb-px border-b-2 border-flare px-3 py-2.5 font-display text-[12px] uppercase tracking-[0.2em] text-paper">
-          Warehouse
-        </span>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        {rig ? (
-          <WarehouseTab inventory={rig.inventory} />
-        ) : (
-          <p className="text-xs text-fog">Loading…</p>
-        )}
-      </div>
+      {rig ? (
+        <PanelBody key={rig.id} rig={rig} />
+      ) : (
+        <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>
+      )}
     </aside>
   );
 }

@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getItems, getRigDetail, getRigSummaries } from "./store.js";
+import {
+  getItems,
+  getRigDetail,
+  getRigSummaries,
+  getShipments,
+  getShipmentsForRig,
+} from "./store.js";
 
 export const routes = Router();
 
@@ -18,4 +24,9 @@ routes.get("/api/rigs/:id", (req, res) => {
 
 routes.get("/api/items", (_req, res) => {
   res.json(getItems());
+});
+
+routes.get("/api/shipments", (req, res) => {
+  const { rigId } = req.query;
+  res.json(typeof rigId === "string" ? getShipmentsForRig(rigId) : getShipments());
 });
