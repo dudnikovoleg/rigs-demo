@@ -1,0 +1,69 @@
+@import "leaflet/dist/leaflet.css";
+@import "tailwindcss";
+
+@theme {
+  --color-sea: #0b141c;
+  --color-hull: #0f1d28;
+  --color-deck: #16293a;
+  --color-seam: #24394c;
+  --color-fog: #8fa6b5;
+  --color-paper: #e9f0f4;
+  --color-flare: #ff6b2c;
+  --font-display: Bahnschrift, "Arial Narrow", "Franklin Gothic Medium", sans-serif;
+}
+
+/* Desaturate OSM tiles toward a nautical-chart look so markers carry the color */
+.leaflet-tile-pane {
+  filter: saturate(0.35) contrast(1.05) brightness(1.04);
+}
+
+.leaflet-container {
+  background: #d5dde1;
+  font-family: inherit;
+}
+
+.leaflet-tooltip {
+  background: #0f1d28;
+  color: #e9f0f4;
+  border: 1px solid #24394c;
+  border-radius: 4px;
+  padding: 3px 9px;
+  font-family: Bahnschrift, "Arial Narrow", sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgba(11, 20, 28, 0.35);
+}
+.leaflet-tooltip-top::before {
+  border-top-color: #24394c;
+}
+
+/* Map markers (Leaflet divIcons) */
+.rig-pin {
+  width: 14px;
+  height: 14px;
+  transform: rotate(45deg);
+  background: #ff6b2c;
+  border: 2px solid #0b141c;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.75);
+  transition: box-shadow 150ms ease;
+}
+.rig-pin--selected {
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.9),
+    0 0 0 7px rgba(255, 107, 44, 0.35);
+}
+
+.port-pin {
+  width: 13px;
+  height: 13px;
+  border-radius: 9999px;
+  background: #16293a;
+  border: 2px solid #e9f0f4;
+  box-shadow: 0 0 0 2px rgba(22, 41, 58, 0.3);
+}
+
+.vessel-pin {
+  width: 18px;
+  height: 18px;
+}

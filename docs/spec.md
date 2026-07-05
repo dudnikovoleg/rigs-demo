@@ -10,24 +10,38 @@ hosted URL.
 
 ## 2. What we're building
 
-A single-page app: a full-screen Leaflet map of the **North Sea** showing ~7 oil
+A single-page app with a Leaflet map of the **North Sea** showing ~7 oil
 rigs and 2 shore supply bases (e.g., Aberdeen, Stavanger). One real write flow
 proves the backend is not a mock.
 
+**App frame.** A slim header bar above the map: product name, region label,
+and an **"All rigs"** button that opens the rig panel in list view.
+*Deferred / nice-to-have:* fleet stats (installations · supply bases · vessels
+under way) and a marker legend in the header.
+
 **Map screen (baseline screen).** Rig markers and port markers on OSM tiles.
 In-transit shipments render as vessel markers positioned along the origin→destination
-line, with a faint route line. Clicking a rig opens the rig panel.
+line, with a faint route line. Clicking a rig marker opens the rig panel in
+detail view; clicking the map or pressing Esc closes it. On selection the map
+pans the rig into the area left of the drawer, and the route lines of shipments
+touching it are highlighted.
 
-**Rig panel (side drawer over the map, not a separate route).** Header: rig name,
-operator, status. Two tabs:
+**Rig panel (side drawer over the map, not a separate route).** Two views:
 
-- **Warehouse** — current inventory (item, quantity, unit, category); plus
-  *Inbound* (undelivered shipments heading to this rig) and *Outbound*
-  (undelivered shipments leaving it). Inbound/outbound are **derived from
-  shipments** — never stored separately, so they can't drift.
-- **Shipments** — all shipments touching this rig: direction, contents, vessel,
-  ETA, status, and a step timeline (requested → loading → in transit → delivered).
-  Selecting an in-transit shipment highlights its vessel on the map.
+- **List ("All rigs")** — every rig as a row: name, operator, status, quick
+  stats (inventory SKUs, inbound/outbound counts). Clicking a row opens the
+  detail view.
+- **Detail** — header: rig name, operator, status, coordinates, and a back
+  arrow that always switches to the list view, regardless of how the detail
+  was opened. Two tabs:
+
+  - **Warehouse** — current inventory (item, quantity, unit, category); plus
+    *Inbound* (undelivered shipments heading to this rig) and *Outbound*
+    (undelivered shipments leaving it). Inbound/outbound are **derived from
+    shipments** — never stored separately, so they can't drift.
+  - **Shipments** — all shipments touching this rig: direction, contents, vessel,
+    ETA, status, and a step timeline (requested → loading → in transit → delivered).
+    Selecting an in-transit shipment highlights its vessel on the map.
 
 **Order flow (the real write).** "Order goods" button in the rig panel → small
 form: pick item from catalog, quantity. Submit → `POST /api/shipments` creates a
@@ -55,7 +69,10 @@ both sides in one step.
 
 ## 4. API (Express, JSON)
 
-- `GET /api/rigs` — all rigs (map markers)
+- `GET /api/rigs` — all rigs (map markers); each rig includes computed
+  `inventorySkuCount`, `inboundCount`, and `outboundCount` (derived
+  server-side from inventory and undelivered shipments) — feeds the list
+  view quick stats (§2)
 - `GET /api/rigs/:id` — rig + its inventory
 - `GET /api/ports` — shore bases
 - `GET /api/items` — catalog (order form)
@@ -71,9 +88,10 @@ both sides in one step.
 client/               Vite + React + TS + Tailwind + TanStack Query + react-leaflet
   src/api.ts            fetch wrappers + query/mutation hooks (all server state)
   src/types.ts          TS mirror of the fixture JSON contract
-  src/App.tsx           layout: map + drawer
-  src/components/       MapView, RigPanel, WarehouseTab, ShipmentsTab,
-                        ShipmentTimeline, OrderForm
+  src/App.tsx           layout: header + map + drawer; drawer state
+                        (closed | list | detail)
+  src/components/       MapView, RigPanel (drawer shell: list + detail),
+                        WarehouseTab, ShipmentsTab, ShipmentTimeline, OrderForm
 server/               Node + Express + TS
   src/index.ts          app bootstrap; serves built client in production
   src/routes.ts         endpoints above
@@ -87,7 +105,12 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
 - **North Sea** as the region — the iconic offshore logistics theater; realistic
   rig names/coordinates are easy to make plausible.
 - **Side drawer** instead of popup/separate page — keeps map context, smoothest
-  click-through.
+  click-through. Validated in the skeleton: header "All rigs" button opens a
+  list view; list ↔ detail navigation with an always-present back arrow in
+  detail; Esc or a map click closes the drawer.
+- Map look (validated in the skeleton): default OSM tiles desaturated via a CSS
+  filter to a chart-like ground; rig/port/vessel markers are Leaflet divIcons
+  styled in CSS — no image assets, no extra map plugins.
 - Vessel map position = linear interpolation origin→destination by stored
   `progress`; static per page load (no live simulation).
 - Inbound/outbound derived from shipments rather than stored (single source of truth).
@@ -116,8 +139,9 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
 1. `npm install && npm run dev` — client and server start with no errors.
 2. `npm run typecheck` passes in both workspaces.
 3. In the browser: map shows North Sea with rig, port, and vessel markers →
-   click a rig → drawer shows inventory with realistic items, Inbound/Outbound
-   lists, Shipments tab with statuses and timelines.
+   click a rig marker (or "All rigs" → a row) → drawer shows inventory with
+   realistic items, Inbound/Outbound lists, Shipments tab with statuses and
+   timelines; the back arrow returns to the All rigs list.
 4. Order flow: order an item → new shipment appears as `requested` in Shipments
    and Inbound → `GET /api/shipments?rigId=…` returns it → stop and restart the
    server → it is still there (fixture file was rewritten).
