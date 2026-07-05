@@ -18,6 +18,8 @@ interface Props {
   /** Selected in-transit shipment (from the Shipments tab) — its vessel glows. */
   selectedShipmentId: string | null;
   onSelectRig: (id: string | null) => void;
+  /** Vessel click: open the shipment on its rig, Shipments tab active (spec §2). */
+  onOpenShipment: (rigId: string, shipmentId: string) => void;
 }
 
 const rigIcon = (selected: boolean) =>
@@ -51,6 +53,13 @@ interface Route {
   vessel: [number, number];
 }
 
+/** Rig a vessel click opens: destination for port→rig, origin for rig→port. */
+function shipmentRigId({ origin, destination }: Shipment): string | null {
+  if (destination.type === "rig") return destination.id;
+  if (origin.type === "rig") return origin.id;
+  return null;
+}
+
 function touchesRig(shipment: Shipment, rigId: string): boolean {
   const { origin, destination } = shipment;
   return (
@@ -76,7 +85,12 @@ function DeselectOnMapClick({ onSelectRig }: Pick<Props, "onSelectRig">) {
   return null;
 }
 
-export default function MapView({ selectedRigId, selectedShipmentId, onSelectRig }: Props) {
+export default function MapView({
+  selectedRigId,
+  selectedShipmentId,
+  onSelectRig,
+  onOpenShipment,
+}: Props) {
   const { data: rigs } = useRigs();
   const { data: ports } = usePorts();
   const { data: shipments } = useAllShipments();
@@ -147,17 +161,23 @@ export default function MapView({ selectedRigId, selectedShipmentId, onSelectRig
           </Marker>
         ))}
 
-        {routes.map(({ shipment, vessel }) => (
-          <Marker
-            key={shipment.id}
-            position={vessel}
-            icon={vesselIcon(shipment.id === selectedShipmentId)}
-          >
-            <Tooltip direction="top" offset={[0, -8]}>
-              {shipment.vessel}
-            </Tooltip>
-          </Marker>
-        ))}
+        {routes.map(({ shipment, vessel }) => {
+          const rigId = shipmentRigId(shipment);
+          return (
+            <Marker
+              key={shipment.id}
+              position={vessel}
+              icon={vesselIcon(shipment.id === selectedShipmentId)}
+              eventHandlers={
+                rigId ? { click: () => onOpenShipment(rigId, shipment.id) } : undefined
+              }
+            >
+              <Tooltip direction="top" offset={[0, -8]}>
+                {shipment.vessel}
+              </Tooltip>
+            </Marker>
+          );
+        })}
 
         {(rigs ?? []).map((rig) => (
           <Marker

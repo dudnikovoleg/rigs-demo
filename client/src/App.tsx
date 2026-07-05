@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import MapView from "./components/MapView";
-import RigPanel from "./components/RigPanel";
+import RigPanel, { type Tab } from "./components/RigPanel";
 
 const queryClient = new QueryClient();
 
@@ -20,9 +20,28 @@ export default function App() {
   // App-owned pattern as the selected rig. Scoped to one rig's tab, so any
   // drawer change drops it.
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
+
+  // Tab the detail view opens on; `seq` bumps per open action so a vessel
+  // click switches to Shipments even when its rig is already shown.
+  const [detailTab, setDetailTab] = useState<{ tab: Tab; seq: number }>({
+    tab: "warehouse",
+    seq: 0,
+  });
+
   const changeDrawer = (next: DrawerState) => {
     setSelectedShipmentId(null);
+    if (next.view !== "closed")
+      setDetailTab((prev) => ({ tab: "warehouse", seq: prev.seq + 1 }));
     setDrawer(next);
+  };
+
+  // Vessel click (spec §2): open the shipment's rig on the Shipments tab with
+  // that shipment selected — one combined action, since changeDrawer clears
+  // the selection.
+  const openShipment = (rigId: string, shipmentId: string) => {
+    setDrawer({ view: "detail", rigId });
+    setSelectedShipmentId(shipmentId);
+    setDetailTab((prev) => ({ tab: "shipments", seq: prev.seq + 1 }));
   };
 
   // Keep the last open drawer content so the panel stays populated during
@@ -72,10 +91,12 @@ export default function App() {
             onSelectRig={(id) =>
               changeDrawer(id ? { view: "detail", rigId: id } : { view: "closed" })
             }
+            onOpenShipment={openShipment}
           />
           <RigPanel
             open={drawer.view !== "closed"}
             shown={shown}
+            detailTab={detailTab}
             selectedShipmentId={selectedShipmentId}
             onSelectShipment={setSelectedShipmentId}
             onSelectRig={(id) => changeDrawer({ view: "detail", rigId: id })}

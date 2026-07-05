@@ -5,19 +5,21 @@ import OrderForm from "./OrderForm";
 import ShipmentsTab from "./ShipmentsTab";
 import WarehouseTab from "./WarehouseTab";
 
-type Tab = "warehouse" | "shipments";
+export type Tab = "warehouse" | "shipments";
 
-/** Rendered with `key={rig.id}` so the active tab resets to Warehouse per rig. */
+/** Rendered with a key from (rig id, open seq) so the tab resets per open action. */
 function PanelBody({
   rig,
+  initialTab,
   selectedShipmentId,
   onSelectShipment,
 }: {
   rig: RigDetail;
+  initialTab: Tab;
   selectedShipmentId: string | null;
   onSelectShipment: (id: string | null) => void;
 }) {
-  const [tab, setTab] = useState<Tab>("warehouse");
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [ordering, setOrdering] = useState(false);
 
   return (
@@ -73,6 +75,8 @@ interface Props {
   open: boolean;
   /** Last open drawer content; kept during the slide-out transition. */
   shown: { view: "list" } | { view: "detail"; rigId: string };
+  /** Tab the detail view starts on; a `seq` change forces the reset. */
+  detailTab: { tab: Tab; seq: number };
   /** Selected in-transit shipment; passed through to the Shipments tab. */
   selectedShipmentId: string | null;
   onSelectShipment: (id: string | null) => void;
@@ -144,6 +148,7 @@ function RigList({ onSelectRig }: { onSelectRig: (id: string) => void }) {
 export default function RigPanel({
   open,
   shown,
+  detailTab,
   selectedShipmentId,
   onSelectShipment,
   onSelectRig,
@@ -218,8 +223,9 @@ export default function RigPanel({
 
           {rig ? (
             <PanelBody
-              key={rig.id}
+              key={`${rig.id}:${detailTab.seq}`}
               rig={rig}
+              initialTab={detailTab.tab}
               selectedShipmentId={selectedShipmentId}
               onSelectShipment={onSelectShipment}
             />
