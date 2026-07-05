@@ -1,0 +1,65 @@
+{
+  "rig-forties-alpha": [
+    { "itemId": "item-drill-pipe", "quantity": 340 },
+    { "itemId": "item-casing-958", "quantity": 120 },
+    { "itemId": "item-cement-g", "quantity": 65 },
+    { "itemId": "item-barite", "quantity": 88 },
+    { "itemId": "item-mgo", "quantity": 420 },
+    { "itemId": "item-fresh-water", "quantity": 260 },
+    { "itemId": "item-provisions", "quantity": 38 },
+    { "itemId": "item-scale-inhibitor", "quantity": 14 }
+  ],
+  "rig-ekofisk": [
+    { "itemId": "item-drill-pipe", "quantity": 280 },
+    { "itemId": "item-cement-g", "quantity": 40 },
+    { "itemId": "item-bentonite", "quantity": 22 },
+    { "itemId": "item-mgo", "quantity": 510 },
+    { "itemId": "item-provisions", "quantity": 44 },
+    { "itemId": "item-methanol", "quantity": 35 },
+    { "itemId": "item-bop-seals", "quantity": 3 }
+  ],
+  "rig-statfjord-b": [
+    { "itemId": "item-casing-958", "quantity": 200 },
+    { "itemId": "item-barite", "quantity": 120 },
+    { "itemId": "item-mgo", "quantity": 380 },
+    { "itemId": "item-fresh-water", "quantity": 310 },
+    { "itemId": "item-provisions", "quantity": 52 },
+    { "itemId": "item-corrosion-inhibitor", "quantity": 18 },
+    { "itemId": "item-wireline-spares", "quantity": 9 },
+    { "itemId": "item-mud-pump-kit", "quantity": 4 }
+  ],
+  "rig-sleipner-a": [
+    { "itemId": "item-cement-g", "quantity": 150 },
+    { "itemId": "item-bentonite", "quantity": 45 },
+    { "itemId": "item-mgo", "quantity": 290 },
+    { "itemId": "item-provisions", "quantity": 30 },
+    { "itemId": "item-methanol", "quantity": 70 },
+    { "itemId": "item-scale-inhibitor", "quantity": 22 }
+  ],
+  "rig-gullfaks-c": [
+    { "itemId": "item-drill-pipe", "quantity": 150 },
+    { "itemId": "item-mgo", "quantity": 180 },
+    { "itemId": "item-fresh-water", "quantity": 90 },
+    { "itemId": "item-provisions", "quantity": 18 },
+    { "itemId": "item-bop-seals", "quantity": 1 },
+    { "itemId": "item-mud-pump-kit", "quantity": 1 }
+  ],
+  "rig-buzzard": [
+    { "itemId": "item-drill-pipe", "quantity": 220 },
+    { "itemId": "item-casing-958", "quantity": 90 },
+    { "itemId": "item-barite", "quantity": 60 },
+    { "itemId": "item-mgo", "quantity": 240 },
+    { "itemId": "item-fresh-water", "quantity": 200 },
+    { "itemId": "item-provisions", "quantity": 26 },
+    { "itemId": "item-wireline-spares", "quantity": 5 }
+  ],
+  "rig-elgin": [
+    { "itemId": "item-casing-958", "quantity": 140 },
+    { "itemId": "item-cement-g", "quantity": 55 },
+    { "itemId": "item-mgo", "quantity": 350 },
+    { "itemId": "item-fresh-water", "quantity": 275 },
+    { "itemId": "item-provisions", "quantity": 34 },
+    { "itemId": "item-corrosion-inhibitor", "quantity": 20 },
+    { "itemId": "item-methanol", "quantity": 48 }
+  ]
+}

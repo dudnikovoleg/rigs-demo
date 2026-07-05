@@ -1,0 +1,86 @@
+[
+  {
+    "id": "item-drill-pipe",
+    "name": "Drill pipe 5½\" S-135",
+    "unit": "joints",
+    "category": "Drilling"
+  },
+  {
+    "id": "item-casing-958",
+    "name": "Casing 9⅝\" L-80",
+    "unit": "joints",
+    "category": "Drilling"
+  },
+  {
+    "id": "item-cement-g",
+    "name": "Oilwell cement, class G",
+    "unit": "t",
+    "category": "Bulk"
+  },
+  {
+    "id": "item-barite",
+    "name": "Barite weighting agent",
+    "unit": "t",
+    "category": "Bulk"
+  },
+  {
+    "id": "item-bentonite",
+    "name": "Bentonite",
+    "unit": "t",
+    "category": "Bulk"
+  },
+  {
+    "id": "item-mgo",
+    "name": "Marine gas oil",
+    "unit": "m³",
+    "category": "Fuel"
+  },
+  {
+    "id": "item-fresh-water",
+    "name": "Potable water",
+    "unit": "m³",
+    "category": "Water"
+  },
+  {
+    "id": "item-provisions",
+    "name": "Provisions (dry/chilled/frozen)",
+    "unit": "pallets",
+    "category": "Provisions"
+  },
+  {
+    "id": "item-methanol",
+    "name": "Methanol",
+    "unit": "m³",
+    "category": "Chemicals"
+  },
+  {
+    "id": "item-scale-inhibitor",
+    "name": "Scale inhibitor",
+    "unit": "drums",
+    "category": "Chemicals"
+  },
+  {
+    "id": "item-corrosion-inhibitor",
+    "name": "Corrosion inhibitor",
+    "unit": "drums",
+    "category": "Chemicals"
+  },
+  {
+    "id": "item-bop-seals",
+    "name": "BOP ram seal kit",
+    "unit": "kits",
+    "category": "Spare parts"
+  },
+  {
+    "id": "item-mud-pump-kit",
+    "name": "Mud pump fluid end kit",
+    "unit": "kits",
+    "category": "Spare parts"
+  },
+  {
+    "id": "item-wireline-spares",
+    "name": "Wireline tool spares",
+    "unit": "boxes",
+    "category": "Spare parts"
+  }
+]

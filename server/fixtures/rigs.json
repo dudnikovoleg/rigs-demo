@@ -1,0 +1,58 @@
+[
+  {
+    "id": "rig-forties-alpha",
+    "name": "Forties Alpha",
+    "lat": 57.74,
+    "lon": 0.87,
+    "operator": "Apache",
+    "status": "active"
+  },
+  {
+    "id": "rig-ekofisk",
+    "name": "Ekofisk 2/4-J",
+    "lat": 56.55,
+    "lon": 3.21,
+    "operator": "ConocoPhillips",
+    "status": "active"
+  },
+  {
+    "id": "rig-statfjord-b",
+    "name": "Statfjord B",
+    "lat": 61.21,
+    "lon": 1.83,
+    "operator": "Equinor",
+    "status": "active"
+  },
+  {
+    "id": "rig-sleipner-a",
+    "name": "Sleipner A",
+    "lat": 58.37,
+    "lon": 1.91,
+    "operator": "Equinor",
+    "status": "active"
+  },
+  {
+    "id": "rig-gullfaks-c",
+    "name": "Gullfaks C",
+    "lat": 61.2,
+    "lon": 2.27,
+    "operator": "Equinor",
+    "status": "maintenance"
+  },
+  {
+    "id": "rig-buzzard",
+    "name": "Buzzard",
+    "lat": 57.87,
+    "lon": -0.25,
+    "operator": "CNOOC Petroleum Europe",
+    "status": "active"
+  },
+  {
+    "id": "rig-elgin",
+    "name": "Elgin PUQ",
+    "lat": 57.01,
+    "lon": 1.84,
+    "operator": "TotalEnergies",
+    "status": "active"
+  }
+]

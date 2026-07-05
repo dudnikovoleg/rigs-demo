@@ -1,0 +1,14 @@
+[
+  {
+    "id": "port-aberdeen",
+    "name": "Aberdeen South Harbour",
+    "lat": 57.132,
+    "lon": -2.062
+  },
+  {
+    "id": "port-stavanger",
+    "name": "Stavanger Supply Base (Dusavik)",
+    "lat": 58.99,
+    "lon": 5.66
+  }
+]
