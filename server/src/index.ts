@@ -2,7 +2,12 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
+import { getDb } from "./db/connection.js";
+import { seedDatabase } from "./db/seed.js";
 import { routes } from "./routes.js";
+
+const db = getDb();
+seedDatabase(db);
 
 const app = express();
 app.use(express.json());
