@@ -4,6 +4,10 @@ How this repo was built: short, single-purpose Claude Code sessions, each
 opened with a Session Brief (Context / Goal / Constraints / Output) and closed
 with a commit. Expensive decisions ran in plan mode, cheap ones didn't.
 
+**Git workflow:** For simplicity, all work was done directly on the `main` branch
+with one commit per slice, rather than creating separate feature branches. Each
+commit represents a complete, verified slice.
+
 ## Phases
 
 1. **CLAUDE.md** — goal, stack, hard constraints, when to plan before coding,

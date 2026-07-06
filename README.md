@@ -2,8 +2,6 @@
 
 Demo app for offshore logistics: a map of oil rigs in the North Sea, each rig acting as a warehouse. Click a rig to see its inventory, inbound/outbound goods, and shipments. Click a vessel to see its delivery details.
 
-**Live demo:** [rigs-demo.onrender.com](https://rigs-demo.onrender.com) (hosted on Render free tier)
-
 ## What's here
 
 - Interactive map with oil rigs, supply ports, and vessels in transit
@@ -56,6 +54,7 @@ npm run typecheck
 - Search, filters, pagination
 - Mobile layout, i18n
 - Automated test suite (manual click-through per assignment definition of done)
+- Cloud deployment (render.yaml included for reference)
 
 ## Development approach
 
