@@ -71,7 +71,7 @@ export default function App() {
           <div className="flex items-center gap-4">
             <button
               onClick={() => changeDrawer({ view: "list" })}
-              className="rounded border border-seam px-3 py-1 font-display text-[11px] uppercase tracking-widest text-fog transition-colors hover:border-flare hover:text-paper focus-visible:outline focus-visible:outline-flare"
+              className="cursor-pointer rounded border border-seam px-3 py-1 font-display text-[11px] uppercase tracking-widest text-flare transition-colors hover:border-flare hover:bg-flare/10 focus-visible:outline focus-visible:outline-flare"
             >
               All rigs
             </button>

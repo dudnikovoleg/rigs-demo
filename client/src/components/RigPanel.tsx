@@ -136,7 +136,12 @@ function RigList({ onSelectRig }: { onSelectRig: (id: string) => void }) {
 
   if (isError)
     return <p className="flex-1 px-5 py-4 text-xs text-fog">Couldn't load rigs.</p>;
-  if (!rigs) return <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>;
+  if (!rigs)
+    return (
+      <div className="flex flex-1 items-center justify-center px-5 py-4">
+        <div className="spinner" />
+      </div>
+    );
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -202,9 +207,9 @@ export default function RigPanel({
                 <button
                   onClick={onShowList}
                   aria-label="Back to all rigs"
-                  className="-ml-1 -mt-1 rounded px-1.5 py-0.5 text-fog transition-colors hover:text-paper focus-visible:outline focus-visible:outline-flare"
+                  className="flex cursor-pointer items-center justify-center rounded px-2 py-1 text-[10px] font-semibold uppercase tracking-widest text-flare transition-colors hover:bg-flare/10 hover:text-paper focus-visible:outline focus-visible:outline-flare"
                 >
-                  ←
+                  <span style={{ display: "inline-block", transform: "rotate(90deg)" }}>▼</span>
                 </button>
                 <p className="text-[10px] uppercase tracking-[0.3em] text-fog">
                   Offshore installation{rig ? ` · ${rig.operator}` : ""}
@@ -232,9 +237,13 @@ export default function RigPanel({
               onSelectShipment={onSelectShipment}
             />
           ) : (
-            <p className="flex-1 px-5 py-4 text-xs text-fog">
-              {isError ? "Couldn't load this rig." : "Loading…"}
-            </p>
+            <div className="flex flex-1 items-center justify-center px-5 py-4">
+              {isError ? (
+                <p className="text-xs text-fog">Couldn't load this rig.</p>
+              ) : (
+                <div className="spinner" />
+              )}
+            </div>
           )}
         </>
       )}

@@ -84,7 +84,10 @@ export default function WarehouseTab({ rigId, inventory }: Props) {
             );
           })}
           {inventory.length === 0 && (
-            <p className="py-2 text-xs text-fog">No inventory recorded for this installation.</p>
+            <p className="py-2 text-xs text-fog">
+              <strong className="text-paper">No inventory on deck.</strong> Order goods below to
+              stock this installation.
+            </p>
           )}
         </div>
       </section>
@@ -93,15 +96,13 @@ export default function WarehouseTab({ rigId, inventory }: Props) {
         title="Inbound"
         shipments={inbound}
         catalog={catalog}
-        emptyText={
-          isError ? "Couldn't load shipments." : "Nothing en route to this installation."
-        }
+        emptyText={isError ? "Couldn't load shipments." : "No goods en route to this installation."}
       />
       <ShipmentFlowSection
         title="Outbound"
         shipments={outbound}
         catalog={catalog}
-        emptyText={isError ? "Couldn't load shipments." : "Nothing leaving this installation."}
+        emptyText={isError ? "Couldn't load shipments." : "No goods leaving this installation."}
       />
     </>
   );

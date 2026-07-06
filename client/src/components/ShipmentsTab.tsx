@@ -54,7 +54,7 @@ function ShipmentCard({
         </span>
       </div>
 
-      <div className="mt-1 flex items-baseline justify-between text-sm text-paper">
+      <div className="mt-1 flex items-baseline justify-between font-display text-base text-paper">
         {shipment.vessel}
         {onToggleSelect && (
           <span className="text-[10px] uppercase tracking-wider text-fog">
@@ -67,7 +67,7 @@ function ShipmentCard({
         {shipment.items.map((line) => {
           const item = catalog.get(line.itemId);
           return (
-            <li key={line.itemId} className="flex justify-between text-xs text-paper/80">
+            <li key={line.itemId} className="flex justify-between text-[11px] text-paper/60">
               <span>{item?.name ?? line.itemId}</span>
               <span className="font-mono">
                 {line.quantity} <span className="text-fog">{item?.unit ?? ""}</span>
@@ -89,7 +89,12 @@ export default function ShipmentsTab({ rigId, selectedShipmentId, onSelectShipme
   const { data: items } = useItems();
   const catalog = new Map((items ?? []).map((item) => [item.id, item]));
 
-  if (isLoading) return <p className="text-xs text-fog">Loading…</p>;
+  if (isLoading)
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="spinner" />
+      </div>
+    );
   if (isError) return <p className="text-xs text-fog">Couldn't load shipments.</p>;
 
   // Active shipments first (soonest ETA on top), delivered history last.
@@ -122,7 +127,10 @@ export default function ShipmentsTab({ rigId, selectedShipmentId, onSelectShipme
           />
         ))}
         {sorted.length === 0 && (
-          <p className="py-2 text-xs text-fog">No shipments touching this installation.</p>
+          <p className="py-2 text-xs text-fog">
+            <strong className="text-paper">No active shipments.</strong> This installation has no
+            goods in transit.
+          </p>
         )}
       </div>
     </section>

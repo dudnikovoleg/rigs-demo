@@ -37,12 +37,17 @@ const portIcon = L.divIcon({
   iconAnchor: [6, 6],
 });
 
-const vesselIcon = (selected: boolean) =>
+const vesselIcon = (bearing: number, selected: boolean) =>
   L.divIcon({
     className: "",
-    html: `<div class="vessel-pin${selected ? " vessel-pin--selected" : ""}"></div>`,
-    iconSize: [10, 10],
-    iconAnchor: [5, 5],
+    html: `<div class="vessel-pin${selected ? " vessel-pin--selected" : ""}" style="transform: rotate(${bearing.toFixed(1)}deg)">
+      <svg width="18" height="18" viewBox="0 0 18 18">
+        ${selected ? '<path class="vessel-blue-stroke" d="M9 1 L15 16 L9 12.5 L3 16 Z" fill="none" stroke="#38bdf8" stroke-width="3.5" stroke-linejoin="round"/>' : ''}
+        <path d="M9 1 L15 16 L9 12.5 L3 16 Z" fill="#0f1d28" stroke="#e9f0f4" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+    </div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
   });
 
 interface Route {
@@ -51,6 +56,7 @@ interface Route {
   to: [number, number];
   /** Vessel position: from→to by stored progress, lerped in projected space. */
   vessel: [number, number];
+  bearing: number;
 }
 
 /** Rig a vessel click opens: destination for port→rig, origin for rig→port. */
@@ -118,7 +124,8 @@ export default function MapView({
         const p1 = L.CRS.EPSG3857.project(L.latLng(to));
         const v = L.CRS.EPSG3857.unproject(p0.add(p1.subtract(p0).multiplyBy(t)));
         const vessel: [number, number] = [v.lat, v.lng];
-        return [{ shipment, from, to, vessel }];
+        const bearing = (Math.atan2(p1.x - p0.x, p1.y - p0.y) * 180) / Math.PI;
+        return [{ shipment, from, to, vessel, bearing }];
       });
   }, [rigs, ports, shipments]);
 
@@ -187,13 +194,13 @@ export default function MapView({
           </Marker>
         ))}
 
-        {routes.map(({ shipment, vessel }) => {
+        {routes.map(({ shipment, vessel, bearing }) => {
           const rigId = shipmentRigId(shipment);
           return (
             <Marker
               key={shipment.id}
               position={vessel}
-              icon={vesselIcon(shipment.id === selectedShipmentId)}
+              icon={vesselIcon(bearing, shipment.id === selectedShipmentId)}
               eventHandlers={
                 rigId ? { click: () => onOpenShipment(rigId, shipment.id) } : undefined
               }
