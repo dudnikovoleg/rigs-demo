@@ -255,6 +255,21 @@ mutation input type doesn't flow through unchanged).
 - Stop and restart the server → the created shipments are still there.
 - `npm run typecheck` passes in both workspaces.
 
+## Slice 11 — Node 24.x migration
+
+**Delivers:** Node engine constraint updated from `20.x` to `24.x` in root `package.json`; `better-sqlite3` upgraded from `^11.9.1` to `^12.11.2` in `server/package.json`; `render.yaml` updated to `NODE_VERSION: "24"`. No code changes — better-sqlite3 v12.x has no API breaking changes, all existing database operations in `server/src/db/` and `server/src/store.ts` work unchanged.
+
+**Files:** `package.json` (root), `server/package.json`, `render.yaml`.
+
+**Verify:**
+- Delete `node_modules` and `package-lock.json`; `npm install` completes without errors on Node 24.16.0 (no "No prebuilt binaries found" warnings, no node-gyp fallback).
+- `npm run typecheck` passes in both workspaces.
+- `npm run dev` → client + server start with no errors; delete `server/data/rigs.db` → server seeds from fixtures successfully.
+- `curl /api/rigs` returns 7 rigs; open browser to `http://localhost:5173` → click rig → inventory renders; order an item → shipment appears in Shipments and Inbound.
+- Stop server, restart → `curl /api/shipments` includes the created shipment (persistence verified).
+- `npm run build && npm run start` → production build serves API + client from one port; full flow works.
+- Deploy to Render.com → public URL end-to-end click-through passes (map → rig → tabs → order → shipment appears).
+
 ## Ordering risks (reviewed; baked into the ordering above)
 
 1. **Fixture schema churn** — `GET /api/rigs` counts read inventory *and*

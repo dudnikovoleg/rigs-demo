@@ -145,7 +145,7 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
 - English UI; desktop browser; no auth (single user, per CLAUDE.md).
 - Demo data is static except user-created orders; no background simulation.
 - No concurrent writers — naive read-modify-write of fixture files is fine.
-- Node 20+, npm workspaces.
+- Node 24+, npm workspaces.
 
 ## 8. Out of scope
 

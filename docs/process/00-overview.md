@@ -56,12 +56,14 @@ commit represents a complete, verified slice.
 | 8 | Vessel click opens the shipment in the drawer | [`4175b1e`](https://github.com/dudnikovoleg/rigs-demo/commit/4175b1e) |
 | 9 | SQLite migration | [`acc0e25`](https://github.com/dudnikovoleg/rigs-demo/commit/acc0e25) |
 | 10 | Order form sets initial status and progress | [`083f135`](https://github.com/dudnikovoleg/rigs-demo/commit/083f135) |
+| 11 | Node 24.x migration | [pending implementation] |
 
 Scope changes went through the docs first:
 
 - Slice 8 — spec [`5d7b19c`](https://github.com/dudnikovoleg/rigs-demo/commit/5d7b19c), tasks [`a79c2e2`](https://github.com/dudnikovoleg/rigs-demo/commit/a79c2e2)
 - Slice 9 — ADR-001 [`32bdcc2`](https://github.com/dudnikovoleg/rigs-demo/commit/32bdcc2), tasks [`839a028`](https://github.com/dudnikovoleg/rigs-demo/commit/839a028)
 - Slice 10 — ADR-002 + spec/tasks [`ccf5303`](https://github.com/dudnikovoleg/rigs-demo/commit/ccf5303)
+- Slice 11 — ADR-003 + tasks [this commit]
 
 Slice-focused review follow-ups: slice 9 — [`67ed471`](https://github.com/dudnikovoleg/rigs-demo/commit/67ed471), slice 10 — [`a802a47`](https://github.com/dudnikovoleg/rigs-demo/commit/a802a47).
 

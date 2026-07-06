@@ -72,3 +72,29 @@ status is `in_transit`.
 
 Advancing the status of an *existing* shipment remains out of scope (spec §8)
 — the status is chosen once, at creation.
+
+## ADR-003: Migrate to Node.js 24.x LTS
+
+**Date:** 2026-07-06  
+**Status:** Accepted
+
+### Context
+
+The project was built on Node 20.x. Node 24.x (Krypton) became the active LTS in May 2025. `better-sqlite3@11.10.0` has no prebuilt binaries for Node 24.x (ABI 137) — installation attempts to compile from source using `node-gyp`, which fails without Visual Studio Build Tools.
+
+### Decision
+
+Migrate to Node 24.x by updating the engine constraint and upgrading `better-sqlite3` from v11.10.0 to v12.11.2.
+
+### Rationale
+
+- Node 24.x is the current LTS and suitable for production
+- `better-sqlite3@12.11.2` provides prebuilt binaries for Node 24.x on Windows/Linux/macOS
+- No API changes in better-sqlite3 v12 — all existing database code remains unchanged
+- Ensures compatibility with modern Node versions
+
+### Consequences
+
+- The project now requires Node 24.x (clients on older Node versions must upgrade)
+- Deployment on Render.com will use Node 24.x runtime
+- All native SQLite bindings work out-of-the-box without compilation
