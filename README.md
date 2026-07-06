@@ -63,4 +63,4 @@ Built AI-assisted: discovery → throwaway client-only skeleton to validate the 
 ## Repository
 
 - GitHub: https://github.com/dudnikovoleg/rigs-demo
-- Deployed on Render free tier (Node 20, ephemeral disk)
+- Deployed on Render free tier (Node 24, ephemeral disk)
