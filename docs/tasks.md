@@ -216,6 +216,45 @@ count, skips if >0).
 - Open browser to `http://localhost:5173` → click rig → inventory renders; navigate to Shipments tab → shipments render; order an item → new shipment appears (UI unchanged).
 - `npm run typecheck` passes in server workspace.
 
+## Slice 10 — Order form sets initial status and progress
+
+Implements spec §2/§4 as amended by ADR-002 (docs/decision-log.md).
+
+**Delivers:** the order form gains a **status** dropdown
+(`requested | loading | in_transit | delivered`, default `requested`) and a
+**progress** input (0–1) rendered only when status is `in_transit`;
+`POST /api/shipments` accepts both as optional fields —
+`{ rigId, itemId, quantity, status?, progress? }` — with validation (status
+must be one of the four enum values; progress a number in 0–1; progress
+ignored and stored as 0 unless status is `in_transit`). Concretely:
+`NewShipmentInput` gains optional `status`/`progress` in **both** mirrors
+(`server/src/store.ts`, `client/src/types.ts` — the client↔server contract
+changes in one step, per CLAUDE.md); `createShipment` replaces its hardcoded
+`status: "requested"` / `progress: 0` with the normalized input; the
+`routes.ts` POST handler extends its body validation. Backward compatible —
+the old three-field body still works. No DB schema change (`status` and
+`progress` columns already exist); no new invalidation work — the slice-6
+mutation already invalidates shipments + rigs, so an `in_transit` order
+appears as a vessel on the map immediately.
+
+**Files:** `server/src/{routes,store}.ts`, `client/src/types.ts`,
+`client/src/components/OrderForm.tsx` (`client/src/api.ts` only if the
+mutation input type doesn't flow through unchanged).
+
+**Verify:**
+- Order with the default status → behaves exactly as before: `requested` in
+  Shipments and Inbound.
+- Order with status `in_transit` and progress `0.5` → shipment at the
+  *in transit* timeline step and a vessel marker mid-route on the map,
+  without a page reload; the progress input is hidden for the other three
+  statuses.
+- `curl -X POST /api/shipments` with the old three-field body → still 201
+  with status `requested`, progress 0 (backward compat).
+- `curl` with `"status":"teleported"` or `"progress":1.5` → 400; with
+  `"status":"loading","progress":0.7` → 201 with progress stored as 0.
+- Stop and restart the server → the created shipments are still there.
+- `npm run typecheck` passes in both workspaces.
+
 ## Ordering risks (reviewed; baked into the ordering above)
 
 1. **Fixture schema churn** — `GET /api/rigs` counts read inventory *and*

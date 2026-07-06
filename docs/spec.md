@@ -49,9 +49,14 @@ touching it are highlighted.
     selected.
 
 **Order flow (the real write).** "Order goods" button in the rig panel → small
-form: pick item from catalog, quantity. Submit → `POST /api/shipments` creates a
-port→rig shipment with status `requested`, persisted to the SQLite DB. It
-immediately appears in the Shipments tab and in Inbound.
+form: pick item from catalog, quantity, and a **status** dropdown
+(`requested | loading | in_transit | delivered`, default `requested`); when
+status is `in_transit`, a **progress** input (0–1) appears — hidden for all
+other statuses. Submit → `POST /api/shipments` creates a port→rig shipment
+with the chosen status, persisted to the SQLite DB. It immediately appears in
+the Shipments tab (at the matching timeline step); in Inbound if undelivered;
+and, when created as `in_transit`, as a vessel marker on the map positioned by
+its progress — so a single order can demo the full lifecycle visuals.
 
 ## 3. Data model & fixtures
 
@@ -87,9 +92,12 @@ The DB schema mirrors this JSON shape and is the client↔server contract
 - `GET /api/items` — catalog (order form)
 - `GET /api/shipments` — all shipments (map vessels); `?rigId=` filters to
   shipments whose origin or destination is that rig
-- `POST /api/shipments` — body { rigId, itemId, quantity } → creates a
-  port→rig shipment, status `requested`, writes to SQLite,
-  returns the created shipment
+- `POST /api/shipments` — body { rigId, itemId, quantity, status?, progress? }
+  → creates a port→rig shipment, writes to SQLite, returns the created
+  shipment. `status` is one of
+  `requested | loading | in_transit | delivered`, default `requested`;
+  `progress` (0–1) applies only when `status` is `in_transit` and defaults
+  to 0 — for any other status it is ignored and stored as 0
 
 ## 5. Repo layout
 
@@ -141,7 +149,9 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
 
 ## 8. Out of scope
 
-- Editing/cancelling shipments; advancing shipment status from the UI
+- Editing/cancelling shipments; advancing the status of an *existing*
+  shipment from the UI (the initial status is chosen at creation in the
+  order form, §2 — after that it's immutable)
 - Rig↔rig transfers
 - Live movement, polling/websockets
 - Search, filters, pagination; mobile layout; i18n
@@ -157,9 +167,12 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
    timelines; the back arrow returns to the All rigs list; clicking a vessel
    marker opens the drawer on that shipment's rig with the Shipments tab
    active and the shipment highlighted.
-4. Order flow: order an item → new shipment appears as `requested` in Shipments
-   and Inbound → `GET /api/shipments?rigId=…` returns it → stop and restart the
-   server process → it is still there (persisted to SQLite).
+4. Order flow: order an item with the default status → new shipment appears as
+   `requested` in Shipments and Inbound → `GET /api/shipments?rigId=…` returns
+   it → stop and restart the server process → it is still there (persisted to
+   SQLite). Then order another item with status `in_transit` and a progress
+   value → it appears at the *in transit* timeline step in Shipments and as a
+   vessel marker positioned along its route on the map.
 5. `npm run build && npm run start` serves the built client and API from one
    process.
 6. Deployed to Render; public URL opened and steps 3–4 (minus restart) clicked

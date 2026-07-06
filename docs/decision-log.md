@@ -80,3 +80,46 @@ Same DoD as baseline:
 2. `npm run typecheck` passes
 3. Order flow: create a shipment → visible in UI → restart server → still there
 4. Deploy to Render → click through → DB resets on redeploy (expected)
+
+## ADR-002: Order form sets initial shipment status and progress
+
+**Date:** 2026-07-06  
+**Status:** Proposed
+
+### Context
+
+The single write flow (`POST /api/shipments`) always created shipments with
+status `requested`. The demo therefore could not showcase the shipment
+lifecycle through a write: the timeline steps beyond *requested* and the
+vessel markers on the map were only reachable via fixture data, never via
+user action.
+
+### Decision
+
+Extend the order form with a **status dropdown**
+(`requested | loading | in_transit | delivered`, default `requested`) and a
+**progress input (0–1)** shown only when status is `in_transit`. Extend
+`POST /api/shipments` to accept both as optional fields:
+`{ rigId, itemId, quantity, status?, progress? }`.
+
+### Rationale
+
+1. **Richer click-through** — a single order can now demo the full timeline
+   and drop a vessel onto the map at a chosen position, the demo's most
+   visual payoff.
+2. **Backward compatible** — both fields are optional with defaults
+   (`status: requested`, `progress: 0`), so the original three-field body
+   remains valid.
+3. **No DB schema change** — `status` and `progress` columns already exist on
+   shipments; only the POST body and the form grow. The CLAUDE.md contract
+   rule (change schema/contract in one deliberate step on both sides) is
+   satisfied by updating the POST body on client and server together, per
+   spec §2 and §4.
+
+### Implementation notes
+
+- `status` must be one of the four enum values; anything else is rejected.
+- `progress` is validated to 0–1 and applies only when `status` is
+  `in_transit`; for any other status it is ignored and stored as 0.
+- Advancing the status of an *existing* shipment remains out of scope
+  (spec §8) — the status is chosen once, at creation.
