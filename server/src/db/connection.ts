@@ -12,26 +12,31 @@ let db: Database.Database | undefined;
 export function getDb(): Database.Database {
   if (db) return db;
 
-  const dataDir = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "..",
-    "data",
-  );
-  if (!existsSync(dataDir)) {
-    mkdirSync(dataDir, { recursive: true });
+  try {
+    const dataDir = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "..",
+      "data",
+    );
+    if (!existsSync(dataDir)) {
+      mkdirSync(dataDir, { recursive: true });
+    }
+
+    const dbPath = path.join(dataDir, "rigs.db");
+    db = new Database(dbPath);
+    db.pragma("foreign_keys = ON");
+
+    const schemaPath = path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "schema.sql",
+    );
+    const schemaSql = readFileSync(schemaPath, "utf8");
+    db.exec(schemaSql);
+
+    return db;
+  } catch (err) {
+    console.error("Failed to initialize database:", err instanceof Error ? err.message : String(err));
+    throw err;
   }
-
-  const dbPath = path.join(dataDir, "rigs.db");
-  db = new Database(dbPath);
-  db.pragma("foreign_keys = ON");
-
-  const schemaPath = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "schema.sql",
-  );
-  const schemaSql = readFileSync(schemaPath, "utf8");
-  db.exec(schemaSql);
-
-  return db;
 }

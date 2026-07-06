@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS shipments (
   created_at TEXT NOT NULL,
   eta TEXT NOT NULL,
   progress REAL NOT NULL
+  -- Note: SQLite doesn't support subqueries in CHECK constraints, so origin_id/destination_id
+  -- validation against ports/rigs tables is enforced at application layer (store.ts)
 );
 
 CREATE TABLE IF NOT EXISTS shipment_items (

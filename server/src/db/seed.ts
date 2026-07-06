@@ -59,7 +59,15 @@ const fixturesDir = path.join(
 
 function readFixture<T>(name: string): T {
   const file = path.join(fixturesDir, `${name}.json`);
-  return JSON.parse(readFileSync(file, "utf8")) as T;
+  try {
+    const content = readFileSync(file, "utf8");
+    return JSON.parse(content) as T;
+  } catch (err) {
+    if (err instanceof Error && 'code' in err && err.code === 'ENOENT') {
+      throw new Error(`Fixture file not found: ${file}`);
+    }
+    throw new Error(`Failed to read fixture ${name}: ${err instanceof Error ? err.message : String(err)}`);
+  }
 }
 
 /**
@@ -68,75 +76,80 @@ function readFixture<T>(name: string): T {
  * shipment_items. Runs in a transaction for atomicity.
  */
 export function seedDatabase(db: Database): void {
-  const rigCount = db.prepare("SELECT COUNT(*) as count FROM rigs").get() as { count: number };
-  if (rigCount.count > 0) {
-    return;
-  }
-
-  console.log("Seeding database from fixtures...");
-
-  const items = readFixture<Item[]>("items");
-  const ports = readFixture<Port[]>("ports");
-  const rigs = readFixture<Rig[]>("rigs");
-  const inventory = readFixture<Inventory>("inventory");
-  const shipments = readFixture<Shipment[]>("shipments");
-
-  const transaction = db.transaction(() => {
-    const insertItem = db.prepare(
-      "INSERT INTO items (id, name, unit, category) VALUES (?, ?, ?, ?)",
-    );
-    for (const item of items) {
-      insertItem.run(item.id, item.name, item.unit, item.category);
+  try {
+    const rigCount = db.prepare("SELECT COUNT(*) as count FROM rigs").get() as { count: number };
+    if (rigCount.count > 0) {
+      return;
     }
 
-    const insertPort = db.prepare(
-      "INSERT INTO ports (id, name, lat, lon) VALUES (?, ?, ?, ?)",
-    );
-    for (const port of ports) {
-      insertPort.run(port.id, port.name, port.lat, port.lon);
-    }
+    console.log("Seeding database from fixtures...");
 
-    const insertRig = db.prepare(
-      "INSERT INTO rigs (id, name, lat, lon, operator, status) VALUES (?, ?, ?, ?, ?, ?)",
-    );
-    for (const rig of rigs) {
-      insertRig.run(rig.id, rig.name, rig.lat, rig.lon, rig.operator, rig.status);
-    }
+    const items = readFixture<Item[]>("items");
+    const ports = readFixture<Port[]>("ports");
+    const rigs = readFixture<Rig[]>("rigs");
+    const inventory = readFixture<Inventory>("inventory");
+    const shipments = readFixture<Shipment[]>("shipments");
 
-    const insertInventory = db.prepare(
-      "INSERT INTO inventory (rig_id, item_id, quantity) VALUES (?, ?, ?)",
-    );
-    for (const [rigId, items] of Object.entries(inventory)) {
-      for (const { itemId, quantity } of items) {
-        insertInventory.run(rigId, itemId, quantity);
-      }
-    }
-
-    const insertShipment = db.prepare(
-      "INSERT INTO shipments (id, origin_type, origin_id, destination_type, destination_id, status, vessel, created_at, eta, progress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-    );
-    const insertShipmentItem = db.prepare(
-      "INSERT INTO shipment_items (shipment_id, item_id, quantity) VALUES (?, ?, ?)",
-    );
-    for (const shipment of shipments) {
-      insertShipment.run(
-        shipment.id,
-        shipment.origin.type,
-        shipment.origin.id,
-        shipment.destination.type,
-        shipment.destination.id,
-        shipment.status,
-        shipment.vessel,
-        shipment.createdAt,
-        shipment.eta,
-        shipment.progress,
+    const transaction = db.transaction(() => {
+      const insertItem = db.prepare(
+        "INSERT INTO items (id, name, unit, category) VALUES (?, ?, ?, ?)",
       );
-      for (const { itemId, quantity } of shipment.items) {
-        insertShipmentItem.run(shipment.id, itemId, quantity);
+      for (const item of items) {
+        insertItem.run(item.id, item.name, item.unit, item.category);
       }
-    }
-  });
 
-  transaction();
-  console.log("Database seeded successfully");
+      const insertPort = db.prepare(
+        "INSERT INTO ports (id, name, lat, lon) VALUES (?, ?, ?, ?)",
+      );
+      for (const port of ports) {
+        insertPort.run(port.id, port.name, port.lat, port.lon);
+      }
+
+      const insertRig = db.prepare(
+        "INSERT INTO rigs (id, name, lat, lon, operator, status) VALUES (?, ?, ?, ?, ?, ?)",
+      );
+      for (const rig of rigs) {
+        insertRig.run(rig.id, rig.name, rig.lat, rig.lon, rig.operator, rig.status);
+      }
+
+      const insertInventory = db.prepare(
+        "INSERT INTO inventory (rig_id, item_id, quantity) VALUES (?, ?, ?)",
+      );
+      for (const [rigId, items] of Object.entries(inventory)) {
+        for (const { itemId, quantity } of items) {
+          insertInventory.run(rigId, itemId, quantity);
+        }
+      }
+
+      const insertShipment = db.prepare(
+        "INSERT INTO shipments (id, origin_type, origin_id, destination_type, destination_id, status, vessel, created_at, eta, progress) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      );
+      const insertShipmentItem = db.prepare(
+        "INSERT INTO shipment_items (shipment_id, item_id, quantity) VALUES (?, ?, ?)",
+      );
+      for (const shipment of shipments) {
+        insertShipment.run(
+          shipment.id,
+          shipment.origin.type,
+          shipment.origin.id,
+          shipment.destination.type,
+          shipment.destination.id,
+          shipment.status,
+          shipment.vessel,
+          shipment.createdAt,
+          shipment.eta,
+          shipment.progress,
+        );
+        for (const { itemId, quantity } of shipment.items) {
+          insertShipmentItem.run(shipment.id, itemId, quantity);
+        }
+      }
+    });
+
+    transaction();
+    console.log("Database seeded successfully");
+  } catch (err) {
+    console.error("Failed to seed database:", err instanceof Error ? err.message : String(err));
+    throw err;
+  }
 }
