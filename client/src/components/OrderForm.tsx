@@ -1,5 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { useCreateShipment, useItems } from "../api";
+import type { ShipmentStatus } from "../types";
+import { STATUS_LABELS } from "./ShipmentTimeline";
+
+const STATUSES: ShipmentStatus[] = ["requested", "loading", "in_transit", "delivered"];
 
 interface Props {
   rigId: string;
@@ -7,24 +11,35 @@ interface Props {
   onClose: () => void;
 }
 
-/** Order goods (spec §2): pick an item from the catalog + quantity → POST /api/shipments. */
+/** Order goods (spec §2, ADR-002): item + quantity + initial status → POST /api/shipments. */
 export default function OrderForm({ rigId, onClose }: Props) {
   const { data: items } = useItems();
   const [itemId, setItemId] = useState("");
   const [quantity, setQuantity] = useState("1");
+  const [status, setStatus] = useState<ShipmentStatus>("requested");
+  const [progress, setProgress] = useState("0.5");
   const createShipment = useCreateShipment();
 
   // Default to the first catalog item until the user picks one.
   const selectedId = itemId || items?.[0]?.id || "";
   const selectedItem = items?.find((item) => item.id === selectedId);
   const qty = Number(quantity);
-  const valid = selectedId !== "" && Number.isInteger(qty) && qty > 0;
+  const prog = Number(progress);
+  const progressValid =
+    status !== "in_transit" || (progress !== "" && Number.isFinite(prog) && prog >= 0 && prog <= 1);
+  const valid = selectedId !== "" && Number.isInteger(qty) && qty > 0 && progressValid;
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!valid || createShipment.isPending) return;
     createShipment.mutate(
-      { rigId, itemId: selectedId, quantity: qty },
+      {
+        rigId,
+        itemId: selectedId,
+        quantity: qty,
+        status,
+        ...(status === "in_transit" ? { progress: prog } : {}),
+      },
       { onSuccess: onClose },
     );
   }
@@ -74,6 +89,36 @@ export default function OrderForm({ rigId, onClose }: Props) {
           className={`mt-1 ${fieldClass} font-mono`}
         />
       </label>
+
+      <label className="mt-3 block text-[10px] uppercase tracking-widest text-fog">
+        Status
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value as ShipmentStatus)}
+          className={`mt-1 ${fieldClass}`}
+        >
+          {STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {STATUS_LABELS[s]}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      {status === "in_transit" && (
+        <label className="mt-3 block text-[10px] uppercase tracking-widest text-fog">
+          Progress (0–1)
+          <input
+            type="number"
+            min={0}
+            max={1}
+            step={0.05}
+            value={progress}
+            onChange={(e) => setProgress(e.target.value)}
+            className={`mt-1 ${fieldClass} font-mono`}
+          />
+        </label>
+      )}
 
       <button
         type="submit"

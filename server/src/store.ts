@@ -53,6 +53,10 @@ export interface NewShipmentInput {
   rigId: string;
   itemId: string;
   quantity: number;
+  /** Defaults to "requested" (ADR-002). */
+  status?: ShipmentStatus;
+  /** 0–1; applies only when status is "in_transit", otherwise stored as 0. */
+  progress?: number;
 }
 
 export interface RigSummary extends Rig {
@@ -266,8 +270,11 @@ const ORDER_VESSELS = [
 
 const ORDER_TRANSIT_HOURS = 72;
 
-export function createShipment({ rigId, itemId, quantity }: NewShipmentInput): Shipment {
+export function createShipment({ rigId, itemId, quantity, status, progress }: NewShipmentInput): Shipment {
   try {
+    const shipmentStatus: ShipmentStatus = status ?? "requested";
+    const shipmentProgress = shipmentStatus === "in_transit" ? progress ?? 0 : 0;
+
     const rig = stmts.getRigForShipment.get(rigId) as
       { id: string; lat: number; lon: number } | undefined;
     if (!rig) throw new Error(`unknown rig: ${rigId}`);
@@ -307,11 +314,11 @@ export function createShipment({ rigId, itemId, quantity }: NewShipmentInput): S
         origin.id,
         "rig",
         rigId,
-        "requested",
+        shipmentStatus,
         vessel,
         createdAt,
         eta,
-        0,
+        shipmentProgress,
       );
 
       stmts.insertShipmentItem.run(shipmentId, itemId, quantity);
@@ -323,11 +330,11 @@ export function createShipment({ rigId, itemId, quantity }: NewShipmentInput): S
       id: shipmentId!,
       origin: { type: "port", id: origin.id },
       destination: { type: "rig", id: rigId },
-      status: "requested",
+      status: shipmentStatus,
       vessel: vessel!,
       createdAt,
       eta,
-      progress: 0,
+      progress: shipmentProgress,
       items: [{ itemId, quantity }],
     };
   } catch (err) {

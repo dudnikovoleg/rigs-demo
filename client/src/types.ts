@@ -54,6 +54,10 @@ export interface NewShipmentInput {
   rigId: string;
   itemId: string;
   quantity: number;
+  /** Defaults to "requested" (ADR-002). */
+  status?: ShipmentStatus;
+  /** 0–1; applies only when status is "in_transit", otherwise stored as 0. */
+  progress?: number;
 }
 
 /** `GET /api/rigs` — rig plus counts computed server-side. */
