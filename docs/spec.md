@@ -50,13 +50,17 @@ touching it are highlighted.
 
 **Order flow (the real write).** "Order goods" button in the rig panel → small
 form: pick item from catalog, quantity. Submit → `POST /api/shipments` creates a
-port→rig shipment with status `requested`, persisted by rewriting the fixture
-file. It immediately appears in the Shipments tab and in Inbound.
+port→rig shipment with status `requested`, persisted to the SQLite DB. It
+immediately appears in the Shipments tab and in Inbound.
 
 ## 3. Data model & fixtures
 
-Fixture files in `server/fixtures/` are the database; all reads/writes go through
-one service module. Field lists are deliberately minimal (client's instruction) —
+SQLite file at `server/data/rigs.db` (gitignored) is the database. On startup,
+if the DB is empty, it seeds from JSON fixtures in `server/fixtures/`. Fixtures
+remain in the repo as the source of truth for seeding. All reads/writes go
+through one service module (`store.ts`).
+
+Field lists are deliberately minimal (client's instruction) —
 enough for a coherent demo, no more.
 
 - `rigs.json` — id, name, lat, lon, operator, status (e.g., active/maintenance)
@@ -69,8 +73,8 @@ enough for a coherent demo, no more.
   createdAt, eta, progress (0–1, meaningful when in transit), items
   [{ itemId, quantity }]
 
-The JSON shape is the client↔server contract (CLAUDE.md); any change happens on
-both sides in one step.
+The DB schema mirrors this JSON shape and is the client↔server contract
+(CLAUDE.md); any change happens on both sides in one step.
 
 ## 4. API (Express, JSON)
 
@@ -84,7 +88,7 @@ both sides in one step.
 - `GET /api/shipments` — all shipments (map vessels); `?rigId=` filters to
   shipments whose origin or destination is that rig
 - `POST /api/shipments` — body { rigId, itemId, quantity } → creates a
-  port→rig shipment, status `requested`, writes `shipments.json` to disk,
+  port→rig shipment, status `requested`, writes to SQLite,
   returns the created shipment
 
 ## 5. Repo layout
@@ -100,8 +104,10 @@ client/               Vite + React + TS + Tailwind + TanStack Query + react-leaf
 server/               Node + Express + TS
   src/index.ts          app bootstrap; serves built client in production
   src/routes.ts         endpoints above
-  src/store.ts          the single service module: read/validate/write fixtures
-  fixtures/*.json       the database
+  src/db.ts             schema init, seed logic, query helpers (SQLite)
+  src/store.ts          the single service module: wraps db.ts queries
+  data/rigs.db          SQLite file (gitignored)
+  fixtures/*.json       source of truth for seeding
 package.json          npm workspaces root; scripts: dev, build, start, typecheck
 ```
 
@@ -120,9 +126,11 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
   `progress`; static per page load (no live simulation).
 - Inbound/outbound derived from shipments rather than stored (single source of truth).
 - **Hosting: Render free tier**, one Node service serving API + built client.
-  Caveat: Render's disk is ephemeral, so a hosted write survives a process
-  restart but not a redeploy — acceptable for the demo; the CLAUDE.md
-  restart-persistence criterion is verified locally.
+  **Ephemeral disk caveat:** Render free tier resets the SQLite file on every
+  deploy or dyno restart. Writes persist during a dyno session (survives process
+  restarts), but the DB resets to the seeded fixture state on redeploy. This is
+  acceptable for the demo — the DB auto-seeds from fixtures on startup. See
+  `docs/decision-log.md` ADR-001 for rationale.
 
 ## 7. Assumptions
 
@@ -151,7 +159,7 @@ package.json          npm workspaces root; scripts: dev, build, start, typecheck
    active and the shipment highlighted.
 4. Order flow: order an item → new shipment appears as `requested` in Shipments
    and Inbound → `GET /api/shipments?rigId=…` returns it → stop and restart the
-   server → it is still there (fixture file was rewritten).
+   server process → it is still there (persisted to SQLite).
 5. `npm run build && npm run start` serves the built client and API from one
    process.
 6. Deployed to Render; public URL opened and steps 3–4 (minus restart) clicked
