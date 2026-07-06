@@ -29,7 +29,9 @@ export interface ItemQuantity {
   quantity: number;
 }
 
-export type ShipmentStatus = "requested" | "loading" | "in_transit" | "delivered";
+/** Ordered lifecycle steps — the one runtime source for dropdowns and the timeline. */
+export const SHIPMENT_STATUSES = ["requested", "loading", "in_transit", "delivered"] as const;
+export type ShipmentStatus = (typeof SHIPMENT_STATUSES)[number];
 
 export interface ShipmentEndpoint {
   type: "port" | "rig";

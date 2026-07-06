@@ -1,9 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useCreateShipment, useItems } from "../api";
-import type { ShipmentStatus } from "../types";
+import { SHIPMENT_STATUSES, type ShipmentStatus } from "../types";
 import { STATUS_LABELS } from "./ShipmentTimeline";
-
-const STATUSES: ShipmentStatus[] = ["requested", "loading", "in_transit", "delivered"];
 
 interface Props {
   rigId: string;
@@ -97,7 +95,7 @@ export default function OrderForm({ rigId, onClose }: Props) {
           onChange={(e) => setStatus(e.target.value as ShipmentStatus)}
           className={`mt-1 ${fieldClass}`}
         >
-          {STATUSES.map((s) => (
+          {SHIPMENT_STATUSES.map((s) => (
             <option key={s} value={s}>
               {STATUS_LABELS[s]}
             </option>

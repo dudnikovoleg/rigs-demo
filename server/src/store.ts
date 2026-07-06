@@ -30,7 +30,9 @@ export interface ItemQuantity {
   quantity: number;
 }
 
-export type ShipmentStatus = "requested" | "loading" | "in_transit" | "delivered";
+/** Ordered lifecycle steps — the one runtime source for validation and UI lists. */
+export const SHIPMENT_STATUSES = ["requested", "loading", "in_transit", "delivered"] as const;
+export type ShipmentStatus = (typeof SHIPMENT_STATUSES)[number];
 
 export interface ShipmentEndpoint {
   type: "port" | "rig";
@@ -294,9 +296,13 @@ export function createShipment({ rigId, itemId, quantity, status, progress }: Ne
         : b,
     );
 
+    // Timestamps consistent with the initial status: an in_transit shipment
+    // departed in the past; a delivered one has already arrived.
+    const transitMs = ORDER_TRANSIT_HOURS * 3_600_000;
+    const elapsedMs = shipmentStatus === "delivered" ? transitMs : shipmentProgress * transitMs;
     const now = new Date();
-    const createdAt = now.toISOString();
-    const eta = new Date(now.getTime() + ORDER_TRANSIT_HOURS * 3_600_000).toISOString();
+    const createdAt = new Date(now.getTime() - elapsedMs).toISOString();
+    const eta = new Date(now.getTime() + (transitMs - elapsedMs)).toISOString();
 
     let shipmentId: string;
     let vessel: string;

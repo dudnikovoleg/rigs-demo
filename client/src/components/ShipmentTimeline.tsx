@@ -1,4 +1,4 @@
-import type { ShipmentStatus } from "../types";
+import { SHIPMENT_STATUSES, type ShipmentStatus } from "../types";
 
 export const STATUS_LABELS: Record<ShipmentStatus, string> = {
   requested: "Requested",
@@ -7,14 +7,12 @@ export const STATUS_LABELS: Record<ShipmentStatus, string> = {
   delivered: "Delivered",
 };
 
-const STEPS: ShipmentStatus[] = ["requested", "loading", "in_transit", "delivered"];
-
 export default function ShipmentTimeline({ status }: { status: ShipmentStatus }) {
-  const current = STEPS.indexOf(status);
+  const current = SHIPMENT_STATUSES.indexOf(status);
 
   return (
     <ol className="flex">
-      {STEPS.map((step, i) => {
+      {SHIPMENT_STATUSES.map((step, i) => {
         const reached = i <= current;
         const active = i === current;
         return (

@@ -7,15 +7,8 @@ import {
   getRigSummaries,
   getShipments,
   getShipmentsForRig,
-  type ShipmentStatus,
+  SHIPMENT_STATUSES,
 } from "./store.js";
-
-const SHIPMENT_STATUSES: readonly ShipmentStatus[] = [
-  "requested",
-  "loading",
-  "in_transit",
-  "delivered",
-];
 
 export const routes = Router();
 
