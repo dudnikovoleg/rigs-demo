@@ -132,8 +132,10 @@ function RigRow({ rig, onSelect }: { rig: RigSummary; onSelect: () => void }) {
 }
 
 function RigList({ onSelectRig }: { onSelectRig: (id: string) => void }) {
-  const { data: rigs } = useRigs();
+  const { data: rigs, isError } = useRigs();
 
+  if (isError)
+    return <p className="flex-1 px-5 py-4 text-xs text-fog">Couldn't load rigs.</p>;
   if (!rigs) return <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>;
 
   return (
@@ -156,7 +158,7 @@ export default function RigPanel({
   onClose,
 }: Props) {
   const rigId = shown.view === "detail" ? shown.rigId : null;
-  const { data: rig } = useRig(rigId);
+  const { data: rig, isError } = useRig(rigId);
 
   const closeButton = (
     <button
@@ -170,7 +172,7 @@ export default function RigPanel({
 
   return (
     <aside
-      aria-hidden={!open}
+      inert={!open}
       className={`absolute inset-y-0 right-0 z-[1100] flex w-[400px] transform flex-col border-l border-seam bg-hull/95 shadow-2xl backdrop-blur-sm transition-transform duration-300 ${
         open ? "translate-x-0" : "translate-x-full"
       }`}
@@ -230,7 +232,9 @@ export default function RigPanel({
               onSelectShipment={onSelectShipment}
             />
           ) : (
-            <p className="flex-1 px-5 py-4 text-xs text-fog">Loading…</p>
+            <p className="flex-1 px-5 py-4 text-xs text-fog">
+              {isError ? "Couldn't load this rig." : "Loading…"}
+            </p>
           )}
         </>
       )}

@@ -1,14 +1,16 @@
 import type { ShipmentStatus } from "../types";
 
-const STEPS: { status: ShipmentStatus; label: string }[] = [
-  { status: "requested", label: "Requested" },
-  { status: "loading", label: "Loading" },
-  { status: "in_transit", label: "In transit" },
-  { status: "delivered", label: "Delivered" },
-];
+export const STATUS_LABELS: Record<ShipmentStatus, string> = {
+  requested: "Requested",
+  loading: "Loading",
+  in_transit: "In transit",
+  delivered: "Delivered",
+};
+
+const STEPS: ShipmentStatus[] = ["requested", "loading", "in_transit", "delivered"];
 
 export default function ShipmentTimeline({ status }: { status: ShipmentStatus }) {
-  const current = STEPS.findIndex((s) => s.status === status);
+  const current = STEPS.indexOf(status);
 
   return (
     <ol className="flex">
@@ -16,7 +18,7 @@ export default function ShipmentTimeline({ status }: { status: ShipmentStatus })
         const reached = i <= current;
         const active = i === current;
         return (
-          <li key={step.status} className="relative flex flex-1 flex-col items-center">
+          <li key={step} className="relative flex flex-1 flex-col items-center">
             {i > 0 && (
               <span
                 aria-hidden
@@ -39,7 +41,7 @@ export default function ShipmentTimeline({ status }: { status: ShipmentStatus })
                 active ? "text-paper" : "text-fog"
               }`}
             >
-              {step.label}
+              {STATUS_LABELS[step]}
             </span>
           </li>
         );

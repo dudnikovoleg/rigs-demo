@@ -85,11 +85,12 @@ function ShipmentCard({
 }
 
 export default function ShipmentsTab({ rigId, selectedShipmentId, onSelectShipment }: Props) {
-  const { data: shipments, isLoading } = useShipments(rigId);
+  const { data: shipments, isLoading, isError } = useShipments(rigId);
   const { data: items } = useItems();
   const catalog = new Map((items ?? []).map((item) => [item.id, item]));
 
   if (isLoading) return <p className="text-xs text-fog">Loading…</p>;
+  if (isError) return <p className="text-xs text-fog">Couldn't load shipments.</p>;
 
   // Active shipments first (soonest ETA on top), delivered history last.
   const sorted = [...(shipments ?? [])].sort((a, b) => {

@@ -29,9 +29,6 @@ export interface ItemQuantity {
   quantity: number;
 }
 
-/** rigId -> inventory lines */
-export type Inventory = Record<string, ItemQuantity[]>;
-
 export type ShipmentStatus = "requested" | "loading" | "in_transit" | "delivered";
 
 export interface ShipmentEndpoint {

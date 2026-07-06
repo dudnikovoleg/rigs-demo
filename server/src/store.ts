@@ -90,7 +90,7 @@ function writeFixture(name: string, data: unknown): void {
   writeFileSync(file, JSON.stringify(data, null, 2) + "\n", "utf8");
 }
 
-export function getRigs(): Rig[] {
+function getRigs(): Rig[] {
   return readFixture<Rig[]>("rigs");
 }
 
@@ -102,7 +102,7 @@ export function getItems(): Item[] {
   return readFixture<Item[]>("items");
 }
 
-export function getInventory(): Inventory {
+function getInventory(): Inventory {
   return readFixture<Inventory>("inventory");
 }
 

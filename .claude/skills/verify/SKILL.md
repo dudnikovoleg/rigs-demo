@@ -60,9 +60,11 @@ Driving the map:
   matches the `/api/rigs` array order, so `page.evaluate(() =>
   fetch("/api/rigs").then(r => r.json()))`, find the target rig's index,
   then `page.locator(".rig-pin").nth(idx).click()`.
-- The drawer is the `aside` element; `aria-hidden` flips to `"true"` when
-  closed (Esc or map click). Wait ~1200ms after marker click for the
-  fly-to pan + slide-in transition before screenshotting.
+- The drawer is the `aside` element; the `inert` attribute is present when
+  closed (Esc or map click) and absent while open. Wait ~1200ms after marker
+  click for the fly-to pan + slide-in transition before screenshotting.
+- Drawer text is CSS-uppercased — match innerText case-insensitively
+  (e.g. "IN TRANSIT", not "In transit").
 - Tabs are `button[role='tab']`; active one has `aria-selected='true'`.
 
 Known noise: every page load logs one 404 for `/favicon.ico`

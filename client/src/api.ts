@@ -80,7 +80,12 @@ export function useCreateShipment() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
       });
-      if (!res.ok) throw new Error(`POST /api/shipments failed: ${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(
+          body?.error ?? `POST /api/shipments failed: ${res.status} ${res.statusText}`,
+        );
+      }
       return res.json() as Promise<Shipment>;
     },
     onSuccess: () => {

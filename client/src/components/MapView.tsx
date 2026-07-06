@@ -49,7 +49,7 @@ interface Route {
   shipment: Shipment;
   from: [number, number];
   to: [number, number];
-  /** Vessel position: linear interpolation from→to by stored progress. */
+  /** Vessel position: from→to by stored progress, lerped in projected space. */
   vessel: [number, number];
 }
 
@@ -75,7 +75,9 @@ function FlyToRig({ lat, lon }: { lat: number | null; lon: number | null }) {
     if (lat === null || lon === null) return;
     const zoom = map.getZoom();
     const point = map.project([lat, lon], zoom).add([200, 0]);
-    map.flyTo(map.unproject(point, zoom), zoom, { duration: 0.6 });
+    // panTo, not flyTo: flyTo's zoom arc leaves the SVG overlay (route lines)
+    // misplaced when the user grabs the map mid-animation.
+    map.panTo(map.unproject(point, zoom), { duration: 0.6 });
   }, [lat, lon, map]);
   return null;
 }
@@ -109,14 +111,36 @@ export default function MapView({
         const from = at(shipment.origin);
         const to = at(shipment.destination);
         if (!from || !to) return [];
+        // Lerp in Web Mercator, not lat/lon: the line is straight on screen,
+        // and lat-space interpolation drifts below it as zoom increases.
         const t = shipment.progress;
-        const vessel: [number, number] = [
-          from[0] + (to[0] - from[0]) * t,
-          from[1] + (to[1] - from[1]) * t,
-        ];
+        const p0 = L.CRS.EPSG3857.project(L.latLng(from));
+        const p1 = L.CRS.EPSG3857.project(L.latLng(to));
+        const v = L.CRS.EPSG3857.unproject(p0.add(p1.subtract(p0).multiplyBy(t)));
+        const vessel: [number, number] = [v.lat, v.lng];
         return [{ shipment, from, to, vessel }];
       });
   }, [rigs, ports, shipments]);
+
+  // One line per unordered endpoint pair: opposite-direction or repeat runs
+  // (e.g. two vessels between the same port and rig) share a single segment
+  // instead of stacking offset dashes.
+  const segments = useMemo(() => {
+    const byKey = new Map<
+      string,
+      { from: [number, number]; to: [number, number]; shipments: Shipment[] }
+    >();
+    for (const { shipment, from, to } of routes) {
+      const key = [shipment.origin, shipment.destination]
+        .map((e) => `${e.type}:${e.id}`)
+        .sort()
+        .join("|");
+      const seg = byKey.get(key);
+      if (seg) seg.shipments.push(shipment);
+      else byKey.set(key, { from, to, shipments: [shipment] });
+    }
+    return [...byKey.entries()].map(([key, seg]) => ({ key, ...seg }));
+  }, [routes]);
 
   return (
     <div className="absolute inset-0">
@@ -135,13 +159,15 @@ export default function MapView({
         <FlyToRig lat={selected?.lat ?? null} lon={selected?.lon ?? null} />
         <DeselectOnMapClick onSelectRig={onSelectRig} />
 
-        {routes.map(({ shipment, from, to }) => {
-          const highlighted =
-            (selectedRigId !== null && touchesRig(shipment, selectedRigId)) ||
-            shipment.id === selectedShipmentId;
+        {segments.map(({ key, from, to, shipments: onSegment }) => {
+          const highlighted = onSegment.some(
+            (shipment) =>
+              (selectedRigId !== null && touchesRig(shipment, selectedRigId)) ||
+              shipment.id === selectedShipmentId,
+          );
           return (
             <Polyline
-              key={shipment.id}
+              key={key}
               positions={[from, to]}
               interactive={false}
               pathOptions={

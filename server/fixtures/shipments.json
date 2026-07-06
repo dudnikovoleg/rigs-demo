@@ -1,168 +1,372 @@
 [
   {
     "id": "shp-1001",
-    "origin": { "type": "port", "id": "port-aberdeen" },
-    "destination": { "type": "rig", "id": "rig-forties-alpha" },
+    "origin": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-forties-alpha"
+    },
     "status": "in_transit",
     "vessel": "Skandi Buchan",
     "createdAt": "2026-07-02T08:30:00Z",
     "eta": "2026-07-05T18:00:00Z",
     "progress": 0.65,
     "items": [
-      { "itemId": "item-drill-pipe", "quantity": 120 },
-      { "itemId": "item-barite", "quantity": 40 }
+      {
+        "itemId": "item-drill-pipe",
+        "quantity": 120
+      },
+      {
+        "itemId": "item-barite",
+        "quantity": 40
+      }
     ]
   },
   {
     "id": "shp-1002",
-    "origin": { "type": "port", "id": "port-aberdeen" },
-    "destination": { "type": "rig", "id": "rig-forties-alpha" },
+    "origin": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-forties-alpha"
+    },
     "status": "requested",
     "vessel": "Ocean Marlin",
     "createdAt": "2026-07-04T14:10:00Z",
     "eta": "2026-07-08T12:00:00Z",
     "progress": 0,
     "items": [
-      { "itemId": "item-provisions", "quantity": 24 },
-      { "itemId": "item-fresh-water", "quantity": 300 }
+      {
+        "itemId": "item-provisions",
+        "quantity": 24
+      },
+      {
+        "itemId": "item-fresh-water",
+        "quantity": 300
+      }
     ]
   },
   {
     "id": "shp-1003",
-    "origin": { "type": "rig", "id": "rig-forties-alpha" },
-    "destination": { "type": "port", "id": "port-aberdeen" },
+    "origin": {
+      "type": "rig",
+      "id": "rig-forties-alpha"
+    },
+    "destination": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
     "status": "loading",
     "vessel": "Island Crusader",
     "createdAt": "2026-07-03T09:00:00Z",
     "eta": "2026-07-07T06:00:00Z",
     "progress": 0,
     "items": [
-      { "itemId": "item-wireline-spares", "quantity": 6 }
+      {
+        "itemId": "item-wireline-spares",
+        "quantity": 6
+      }
     ]
   },
   {
     "id": "shp-1004",
-    "origin": { "type": "port", "id": "port-stavanger" },
-    "destination": { "type": "rig", "id": "rig-statfjord-b" },
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-statfjord-b"
+    },
     "status": "in_transit",
     "vessel": "Far Sygna",
     "createdAt": "2026-07-03T16:45:00Z",
     "eta": "2026-07-06T04:00:00Z",
     "progress": 0.4,
     "items": [
-      { "itemId": "item-methanol", "quantity": 60 },
-      { "itemId": "item-scale-inhibitor", "quantity": 25 }
+      {
+        "itemId": "item-methanol",
+        "quantity": 60
+      },
+      {
+        "itemId": "item-scale-inhibitor",
+        "quantity": 25
+      }
     ]
   },
   {
     "id": "shp-1005",
-    "origin": { "type": "port", "id": "port-stavanger" },
-    "destination": { "type": "rig", "id": "rig-gullfaks-c" },
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-gullfaks-c"
+    },
     "status": "in_transit",
     "vessel": "Olympic Ares",
     "createdAt": "2026-07-02T11:20:00Z",
     "eta": "2026-07-05T20:00:00Z",
     "progress": 0.8,
     "items": [
-      { "itemId": "item-mud-pump-kit", "quantity": 3 },
-      { "itemId": "item-bop-seals", "quantity": 2 },
-      { "itemId": "item-mgo", "quantity": 150 }
+      {
+        "itemId": "item-mud-pump-kit",
+        "quantity": 3
+      },
+      {
+        "itemId": "item-bop-seals",
+        "quantity": 2
+      },
+      {
+        "itemId": "item-mgo",
+        "quantity": 150
+      }
     ]
   },
   {
     "id": "shp-1006",
-    "origin": { "type": "port", "id": "port-stavanger" },
-    "destination": { "type": "rig", "id": "rig-gullfaks-c" },
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-gullfaks-c"
+    },
     "status": "requested",
     "vessel": "Rem Ocean",
     "createdAt": "2026-07-04T18:30:00Z",
     "eta": "2026-07-09T10:00:00Z",
     "progress": 0,
     "items": [
-      { "itemId": "item-casing-958", "quantity": 80 }
+      {
+        "itemId": "item-casing-958",
+        "quantity": 80
+      }
     ]
   },
   {
     "id": "shp-1007",
-    "origin": { "type": "port", "id": "port-stavanger" },
-    "destination": { "type": "rig", "id": "rig-sleipner-a" },
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-sleipner-a"
+    },
     "status": "delivered",
     "vessel": "Havila Fortune",
     "createdAt": "2026-06-24T07:15:00Z",
     "eta": "2026-06-27T14:00:00Z",
     "progress": 1,
     "items": [
-      { "itemId": "item-cement-g", "quantity": 90 },
-      { "itemId": "item-bentonite", "quantity": 30 }
+      {
+        "itemId": "item-cement-g",
+        "quantity": 90
+      },
+      {
+        "itemId": "item-bentonite",
+        "quantity": 30
+      }
     ]
   },
   {
     "id": "shp-1008",
-    "origin": { "type": "port", "id": "port-aberdeen" },
-    "destination": { "type": "rig", "id": "rig-buzzard" },
+    "origin": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-buzzard"
+    },
     "status": "in_transit",
     "vessel": "Viking Prince",
     "createdAt": "2026-07-04T05:50:00Z",
     "eta": "2026-07-06T09:00:00Z",
     "progress": 0.25,
     "items": [
-      { "itemId": "item-mgo", "quantity": 400 },
-      { "itemId": "item-provisions", "quantity": 16 }
+      {
+        "itemId": "item-mgo",
+        "quantity": 400
+      },
+      {
+        "itemId": "item-provisions",
+        "quantity": 16
+      }
     ]
   },
   {
     "id": "shp-1009",
-    "origin": { "type": "port", "id": "port-aberdeen" },
-    "destination": { "type": "rig", "id": "rig-elgin" },
+    "origin": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-elgin"
+    },
     "status": "delivered",
     "vessel": "Grampian Sovereign",
     "createdAt": "2026-06-28T13:00:00Z",
     "eta": "2026-07-01T08:00:00Z",
     "progress": 1,
     "items": [
-      { "itemId": "item-corrosion-inhibitor", "quantity": 12 },
-      { "itemId": "item-provisions", "quantity": 10 }
+      {
+        "itemId": "item-corrosion-inhibitor",
+        "quantity": 12
+      },
+      {
+        "itemId": "item-provisions",
+        "quantity": 10
+      }
     ]
   },
   {
     "id": "shp-1010",
-    "origin": { "type": "port", "id": "port-stavanger" },
-    "destination": { "type": "rig", "id": "rig-ekofisk" },
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-ekofisk"
+    },
     "status": "requested",
     "vessel": "Energy Duchess",
     "createdAt": "2026-07-05T09:40:00Z",
     "eta": "2026-07-10T16:00:00Z",
     "progress": 0,
     "items": [
-      { "itemId": "item-fresh-water", "quantity": 250 },
-      { "itemId": "item-provisions", "quantity": 20 }
+      {
+        "itemId": "item-fresh-water",
+        "quantity": 250
+      },
+      {
+        "itemId": "item-provisions",
+        "quantity": 20
+      }
     ]
   },
   {
     "id": "shp-1011",
-    "origin": { "type": "rig", "id": "rig-statfjord-b" },
-    "destination": { "type": "port", "id": "port-stavanger" },
+    "origin": {
+      "type": "rig",
+      "id": "rig-statfjord-b"
+    },
+    "destination": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
     "status": "in_transit",
     "vessel": "Island Contender",
     "createdAt": "2026-07-03T22:00:00Z",
     "eta": "2026-07-06T18:00:00Z",
     "progress": 0.5,
     "items": [
-      { "itemId": "item-drill-pipe", "quantity": 60 }
+      {
+        "itemId": "item-drill-pipe",
+        "quantity": 60
+      }
     ]
   },
   {
     "id": "shp-1012",
-    "origin": { "type": "port", "id": "port-aberdeen" },
-    "destination": { "type": "rig", "id": "rig-elgin" },
+    "origin": {
+      "type": "port",
+      "id": "port-aberdeen"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-elgin"
+    },
     "status": "loading",
     "vessel": "Caledonian Vision",
     "createdAt": "2026-07-04T10:25:00Z",
     "eta": "2026-07-07T20:00:00Z",
     "progress": 0,
     "items": [
-      { "itemId": "item-methanol", "quantity": 45 },
-      { "itemId": "item-scale-inhibitor", "quantity": 10 }
+      {
+        "itemId": "item-methanol",
+        "quantity": 45
+      },
+      {
+        "itemId": "item-scale-inhibitor",
+        "quantity": 10
+      }
+    ]
+  },
+  {
+    "id": "shp-1013",
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-gullfaks-c"
+    },
+    "status": "requested",
+    "vessel": "Stril Mariner",
+    "createdAt": "2026-07-05T18:26:43.654Z",
+    "eta": "2026-07-08T18:26:43.654Z",
+    "progress": 0,
+    "items": [
+      {
+        "itemId": "item-corrosion-inhibitor",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "shp-1014",
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-gullfaks-c"
+    },
+    "status": "requested",
+    "vessel": "Edda Ferd",
+    "createdAt": "2026-07-05T18:26:50.515Z",
+    "eta": "2026-07-08T18:26:50.515Z",
+    "progress": 0,
+    "items": [
+      {
+        "itemId": "item-drill-pipe",
+        "quantity": 1
+      }
+    ]
+  },
+  {
+    "id": "shp-1015",
+    "origin": {
+      "type": "port",
+      "id": "port-stavanger"
+    },
+    "destination": {
+      "type": "rig",
+      "id": "rig-gullfaks-c"
+    },
+    "status": "requested",
+    "vessel": "North Sea Atlantic",
+    "createdAt": "2026-07-05T18:26:51.429Z",
+    "eta": "2026-07-08T18:26:51.429Z",
+    "progress": 0,
+    "items": [
+      {
+        "itemId": "item-drill-pipe",
+        "quantity": 1
+      }
     ]
   }
 ]

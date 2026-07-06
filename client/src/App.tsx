@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import MapView from "./components/MapView";
 import RigPanel, { type Tab } from "./components/RigPanel";
@@ -28,12 +28,12 @@ export default function App() {
     seq: 0,
   });
 
-  const changeDrawer = (next: DrawerState) => {
+  const changeDrawer = useCallback((next: DrawerState) => {
     setSelectedShipmentId(null);
     if (next.view !== "closed")
       setDetailTab((prev) => ({ tab: "warehouse", seq: prev.seq + 1 }));
     setDrawer(next);
-  };
+  }, []);
 
   // Vessel click (spec §2): open the shipment's rig on the Shipments tab with
   // that shipment selected — one combined action, since changeDrawer clears
@@ -53,14 +53,11 @@ export default function App() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setSelectedShipmentId(null);
-        setDrawer({ view: "closed" });
-      }
+      if (e.key === "Escape") changeDrawer({ view: "closed" });
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [changeDrawer]);
 
   const selectedRigId = drawer.view === "detail" ? drawer.rigId : null;
 

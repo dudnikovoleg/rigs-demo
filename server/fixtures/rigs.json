@@ -18,8 +18,8 @@
   {
     "id": "rig-statfjord-b",
     "name": "Statfjord B",
-    "lat": 61.21,
-    "lon": 1.83,
+    "lat": 61.27,
+    "lon": 1.71,
     "operator": "Equinor",
     "status": "active"
   },
@@ -34,8 +34,8 @@
   {
     "id": "rig-gullfaks-c",
     "name": "Gullfaks C",
-    "lat": 61.2,
-    "lon": 2.27,
+    "lat": 61.1,
+    "lon": 2.46,
     "operator": "Equinor",
     "status": "maintenance"
   },

@@ -1,18 +1,12 @@
 import { useItems, useShipments } from "../api";
 import type { Item, ItemQuantity, Shipment } from "../types";
 import { formatEta } from "./ShipmentsTab";
+import { STATUS_LABELS } from "./ShipmentTimeline";
 
 interface Props {
   rigId: string;
   inventory: ItemQuantity[];
 }
-
-const STATUS_LABELS: Record<Shipment["status"], string> = {
-  requested: "Requested",
-  loading: "Loading",
-  in_transit: "In transit",
-  delivered: "Delivered",
-};
 
 function ShipmentFlowSection({
   title,
@@ -59,7 +53,7 @@ export default function WarehouseTab({ rigId, inventory }: Props) {
 
   // Inbound/outbound are derived from undelivered shipments — never stored
   // (spec §2), so they can't drift from the shipments fixture.
-  const { data: shipments } = useShipments(rigId);
+  const { data: shipments, isError } = useShipments(rigId);
   const undelivered = (shipments ?? []).filter((s) => s.status !== "delivered");
   const inbound = undelivered.filter(
     (s) => s.destination.type === "rig" && s.destination.id === rigId,
@@ -99,13 +93,15 @@ export default function WarehouseTab({ rigId, inventory }: Props) {
         title="Inbound"
         shipments={inbound}
         catalog={catalog}
-        emptyText="Nothing en route to this installation."
+        emptyText={
+          isError ? "Couldn't load shipments." : "Nothing en route to this installation."
+        }
       />
       <ShipmentFlowSection
         title="Outbound"
         shipments={outbound}
         catalog={catalog}
-        emptyText="Nothing leaving this installation."
+        emptyText={isError ? "Couldn't load shipments." : "Nothing leaving this installation."}
       />
     </>
   );
