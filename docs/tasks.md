@@ -180,6 +180,42 @@ highlighting already keys off `selectedShipmentId` — reused as-is.
   closes and clears selection.
 - `npm run typecheck` passes.
 
+## Slice 9 — SQLite migration: fixtures → database, store.ts rewrite
+
+**Delivers:** `better-sqlite3` dependency; normalized DB schema (8 tables:
+ports, items, rigs, inventory — denormalized from object structure —
+shipments with flattened origin/destination columns, shipment_items junction
+table); `server/src/db/` module (schema.sql DDL, connection.ts singleton
+with lazy init + foreign-key pragma, seed.ts reading all five fixtures and
+populating the DB in a transaction respecting FK order); `store.ts`
+completely rewritten — every exported function (`getPorts`, `getItems`,
+`getShipments`, `getShipmentsForRig`, `getRigDetail`, `getRigSummaries`,
+`createShipment`) replaced with SQL queries reconstructing the exact same
+return types (shipments query flattens then rebuilds nested
+origin/destination and items array; summaries use GROUP BY for counts);
+`index.ts` initializes DB and seeds if empty before starting server; DB file
+(`server/data/rigs.db`) gitignored; **routes.ts unchanged** (proves API
+contract preserved); all TypeScript type exports in store.ts **unchanged**;
+fixtures remain in repo as source of truth for seeding. The schema
+normalizes `inventory.json` from `{rigId: [{itemId, quantity}]}` to rows
+with composite PK `(rig_id, item_id)` and denormalizes `shipments.json`
+items arrays into the shipment_items junction table. `createShipment` uses
+`db.transaction()` for atomic insert into shipments + shipment_items and
+queries `MAX(id)` for sequential IDs. Seeding is idempotent (checks rig
+count, skips if >0).
+
+**Files:** `server/package.json` (add better-sqlite3), `server/src/db/{schema.sql,connection.ts,seed.ts}`, `server/src/store.ts` (full rewrite preserving exports), `server/src/index.ts` (add DB init), `.gitignore` (add server/data/).
+
+**Verify:**
+- Delete `server/data/rigs.db` if exists; `npm run dev` → console logs "Seeding database from fixtures..." and "Database seeded successfully".
+- `curl /api/rigs` returns 7 rigs with correct inventorySkuCount/inboundCount/outboundCount (compare to a manual fixture count for one rig).
+- `curl /api/rigs/rig-forties-alpha | jq '.inventory | length'` matches the fixture inventory entry count.
+- `curl /api/shipments | jq 'length'` returns 15 (fixture shipments count); inspect one shipment JSON to confirm origin/destination and items array reconstructed correctly.
+- `curl -X POST /api/shipments -H "Content-Type: application/json" -d '{"rigId":"rig-buzzard","itemId":"item-mgo","quantity":100}'` → returns new shipment with `id: "shp-1016"` (next sequential).
+- Stop server (Ctrl+C), restart with `npm run dev` → `curl /api/shipments | jq '.[] | select(.id=="shp-1016")'` returns the created shipment (persistence verified).
+- Open browser to `http://localhost:5173` → click rig → inventory renders; navigate to Shipments tab → shipments render; order an item → new shipment appears (UI unchanged).
+- `npm run typecheck` passes in server workspace.
+
 ## Ordering risks (reviewed; baked into the ordering above)
 
 1. **Fixture schema churn** — `GET /api/rigs` counts read inventory *and*
